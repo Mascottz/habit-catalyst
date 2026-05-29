@@ -1,86 +1,708 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Habit Catalyst — Advanced Track Engine</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nkeiruka's Sanctuary — Daily Devotional & Advanced Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sage: {
+                            50: '#f4f6f2',
+                            100: '#e5ebd9',
+                            500: '#82966c',
+                            600: '#6b7d57',
+                        },
+                        rosewood: {
+                            50: '#fff5f5',
+                            100: '#ffe3e3',
+                            400: '#e29595',
+                            500: '#cf7575',
+                            600: '#b85656',
+                        },
+                        cream: {
+                            50: '#fafaf7',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        /* Heatmap Grid Matrix Alignment */
+        .heatmap-grid {
+            display: grid;
+            grid-template-rows: repeat(7, 11px);
+            grid-auto-flow: column;
+            gap: 3px;
+        }
+        .heat-square {
+            width: 11px;
+            height: 11px;
+            border-radius: 2px;
+            background-color: #e5ebd9;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        /* Heatmap shading intensities using our Rose palette */
+        .heat-square.level-0 { background-color: #e5ebd9; }
+        .heat-square.level-1 { background-color: #fca5a5; }
+        .heat-square.level-2 { background-color: #f87171; }
+        .heat-square.level-3 { background-color: #cf7575; }
+
+        /* Custom Hover Tooltips */
+        .heat-square:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 140%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-cream-50 via-sage-50 to-rosewood-50 min-h-screen text-gray-800 font-sans pb-24 md:pb-6 md:pl-64">
 
-  <div class="app-container">
-    <header>
-      <div>
-        <h1>Habit Catalyst</h1>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">Advanced Data Engine v1.1</p>
-      </div>
-      <div style="display: flex; gap: 0.8rem; align-items: center;">
-        <button onclick="exportData()" class="btn-secondary" title="Download backup file">💾 Export Data</button>
-        <label class="btn-secondary" style="cursor: pointer; display: inline-block;" title="Upload a backup file">
-          📂 Import Data
-          <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
-        </label>
-        <button id="openModalBtn" class="btn-primary">+ Add New Habit</button>
-      </div>
-    </header>
-
-    <section class="analytics-panel">
-      <div class="analytics-header">
-        <h3>Yearly Consistency Map</h3>
-        <div class="heatmap-legend">
-          <span>Less</span>
-          <div class="legend-square level-0"></div>
-          <div class="legend-square level-1"></div>
-          <div class="legend-square level-2"></div>
-          <div class="legend-square level-3"></div>
-          <span>More</span>
+    <nav class="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 bg-white border-r border-sage-100 p-6 justify-between z-10">
+        <div>
+            <div class="flex items-center gap-3 mb-10 px-2">
+                <div class="w-9 h-9 rounded-full bg-rosewood-500 flex items-center justify-center text-white shadow-sm">
+                    <i class="fa-solid fa-dove text-sm"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-lg tracking-wide text-gray-900 leading-tight">Nkeiruka's</span>
+                    <span class="text-xs font-medium text-rosewood-500 uppercase tracking-widest">Sanctuary</span>
+                </div>
+            </div>
+            
+            <div class="space-y-1.5">
+                <button onclick="switchPage('dashboard')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left font-medium transition-all text-rosewood-500 bg-rosewood-50" data-page="dashboard">
+                    <i class="fa-solid fa-house-chimney w-5"></i> Dashboard
+                </button>
+                <button onclick="switchPage('devotion')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left font-medium transition-all text-gray-500 hover:bg-sage-50 hover:text-sage-600" data-page="devotion">
+                    <i class="fa-solid fa-book-open w-5"></i> Word & Devotion
+                </button>
+                <button onclick="switchPage('habits')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left font-medium transition-all text-gray-500 hover:bg-sage-50 hover:text-sage-600" data-page="habits">
+                    <i class="fa-solid fa-heart w-5"></i> Habit Tracker
+                </button>
+                <button onclick="switchPage('prayer')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left font-medium transition-all text-gray-500 hover:bg-sage-50 hover:text-sage-600" data-page="prayer">
+                    <i class="fa-solid fa-hands-praying w-5"></i> Prayer Wall
+                </button>
+                <button onclick="switchPage('milestones')" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left font-medium transition-all text-gray-500 hover:bg-sage-50 hover:text-sage-600" data-page="milestones">
+                    <i class="fa-solid fa-bookmark w-5"></i> Growth Notes
+                </button>
+            </div>
         </div>
-      </div>
-      <div class="heatmap-wrapper">
-        <div id="heatmapGrid" class="heatmap-grid"></div>
-      </div>
-    </section>
-
-    <main id="habitsContainer" class="habits-grid">
-      </main>
-  </div>
-
-  <div id="habitModal" class="modal-overlay">
-    <div class="modal-content">
-      <h2>Create a New Habit</h2>
-      <form id="habitForm">
-        <div class="form-group">
-          <label for="habitName">Habit Name</label>
-          <input type="text" id="habitName" required placeholder="e.g., Drink Water, Study Code...">
+        
+        <div class="space-y-4 border-t border-gray-100 pt-4">
+            <div class="flex items-center gap-2 px-2">
+                <button onclick="exportDataEngine()" class="text-[11px] font-semibold bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1">💾 Export</button>
+                <label class="text-[11px] font-semibold bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1">
+                    📂 Import
+                    <input type="file" accept=".json" onchange="importDataEngine(event)" class="hidden">
+                </label>
+            </div>
+            <div class="px-2 text-xs text-rosewood-400 font-medium italic">For my beloved Rosemary.</div>
         </div>
+    </nav>
 
-        <div class="form-group">
-          <label for="habitType">Tracking Style</label>
-          <select id="habitType">
-            <option value="binary">Simple Checkbox (Yes / No)</option>
-            <option value="quantifiable">Quantifiable (Set a Target)</option>
-          </select>
-        </div>
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-sage-100 flex justify-around py-3 z-10 px-2 shadow-lg">
+        <button onclick="switchPage('dashboard')" class="mobile-nav-btn flex flex-col items-center gap-1 text-rosewood-500" data-page="dashboard"><i class="fa-solid fa-house-chimney text-lg"></i><span class="text-[10px] font-semibold">Home</span></button>
+        <button onclick="switchPage('devotion')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400" data-page="devotion"><i class="fa-solid fa-book-open text-lg"></i><span class="text-[10px] font-semibold">Word</span></button>
+        <button onclick="switchPage('habits')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400" data-page="habits"><i class="fa-solid fa-heart text-lg"></i><span class="text-[10px] font-semibold">Habits</span></button>
+        <button onclick="switchPage('prayer')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400" data-page="prayer"><i class="fa-solid fa-hands-praying text-lg"></i><span class="text-[10px] font-semibold">Prayers</span></button>
+        <button onclick="switchPage('milestones')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400" data-page="milestones"><i class="fa-solid fa-bookmark text-lg"></i><span class="text-[10px] font-semibold">Notes</span></button>
+    </nav>
 
-        <div id="quantifiableFields" class="form-group-row" style="display: none;">
-          <div class="form-group">
-            <label for="habitTarget">Daily Target</label>
-            <input type="number" id="habitTarget" min="1" value="1">
-          </div>
-          <div class="form-group">
-            <label for="habitUnit">Unit</label>
-            <input type="text" id="habitUnit" placeholder="e.g., pages, ml, mins">
-          </div>
-        </div>
+    <main class="max-w-5xl mx-auto px-4 py-8 md:py-12">
 
-        <div class="modal-actions">
-          <button type="button" id="closeModalBtn" class="btn-secondary">Cancel</button>
-          <button type="submit" class="btn-primary">Save Habit</button>
+        <section id="dashboard" class="page active space-y-8">
+            <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 id="dynamic-greeting" class="text-3xl font-bold text-gray-900 tracking-tight">Good Morning, Nkeiruka ✨</h1>
+                    <p class="text-sage-600">Welcome to your quiet space. May your spirit be refreshed today.</p>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-sage-100 text-sm font-medium text-rosewood-500 self-start" id="current-date"></div>
+            </header>
+
+            <div class="bg-white rounded-2xl border border-sage-100 p-5 shadow-sm space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-rosewood-400"></i> Yearly Consistency Map</h3>
+                    <div class="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
+                        <span>Less</span>
+                        <div class="w-2.5 h-2.5 rounded bg-sage-100"></div>
+                        <div class="w-2.5 h-2.5 rounded bg-red-200"></div>
+                        <div class="w-2.5 h-2.5 rounded bg-red-400"></div>
+                        <div class="w-2.5 h-2.5 rounded bg-rosewood-500"></div>
+                        <span>More</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto pb-2">
+                    <div id="heatmapGrid" class="heatmap-grid"></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 border border-rosewood-100/60 relative overflow-hidden">
+                <span class="text-xs font-bold uppercase tracking-widest text-rosewood-600 bg-rosewood-50 px-3 py-1 rounded-full">Anchor Verse of the Day</span>
+                <blockquote id="dashboard-verse" class="mt-4 text-lg md:text-xl font-light text-gray-800 italic leading-relaxed">
+                    "The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you..."
+                </blockquote>
+                <cite id="dashboard-reference" class="block mt-4 text-sm font-semibold text-rosewood-500 not-italic">— Numbers 6:24-26</cite>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-sage-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-gray-900 text-lg">Today's Focus Chapter</h3>
+                        <p class="text-sm text-gray-500 mt-1">Reading: <span id="dashboard-reading-chapter" class="font-semibold text-rosewood-500">John 15</span></p>
+                    </div>
+                    <button onclick="switchPage('devotion')" class="w-10 h-10 rounded-full bg-rosewood-50 hover:bg-rosewood-100 flex items-center justify-center text-rosewood-600 transition-colors">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="bg-gradient-to-br from-rosewood-50 to-cream-50 border border-rosewood-100 rounded-2xl p-6 shadow-sm flex items-start gap-4">
+                    <div class="text-rosewood-400 text-xl mt-0.5"><i class="fa-solid fa-pen-nib"></i></div>
+                    <div>
+                        <h4 class="font-bold text-rosewood-900">A Message For You</h4>
+                        <p class="text-sm text-rosewood-800/90 mt-1 italic leading-relaxed">"Rosemary, I am so incredibly proud of your beautiful heart and your deep devotion. Take things one peaceful step at a time today. I am cheering you on always!"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="devotion" class="page space-y-8">
+            <header>
+                <h1 class="text-3xl font-bold text-gray-900">Word & Devotion</h1>
+                <p class="text-sage-600">Deepen your roots in truth, Rosemary.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sage-100 space-y-4">
+                        <h2 id="devotion-title" class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fa-solid fa-feather-pointed text-rosewood-500"></i> Abiding in the Vine
+                        </h2>
+                        <div id="devotion-body" class="text-gray-600 leading-relaxed space-y-3"></div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-sage-100">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-rosewood-500"></i> Daily Reading Goal
+                        </h3>
+                        <div id="reading-plan-container"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-sage-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-book-journal-whills text-rosewood-500"></i> SOAP Study Notes
+                        </h3>
+                        <p class="text-xs text-gray-400 mb-4">Your personal, secure digital study space.</p>
+                        
+                        <div class="space-y-3.5">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-rosewood-500 mb-1">S • Scripture</label>
+                                <input type="text" id="soap-s" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-rosewood-400 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-rosewood-500 mb-1">O • Observation</label>
+                                <textarea id="soap-o" rows="2" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-rosewood-400 focus:bg-white transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-rosewood-500 mb-1">A • Application</label>
+                                <textarea id="soap-a" rows="2" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-rosewood-400 focus:bg-white transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-rosewood-500 mb-1">P • Prayer</label>
+                                <textarea id="soap-p" rows="3" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-rosewood-400 focus:bg-white transition-all resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="saveSoapEntry()" class="mt-6 w-full bg-rosewood-500 hover:bg-rosewood-600 text-white font-medium py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+                        Save Study Entry
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="habits" class="page space-y-8">
+            <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">The Daily Temple</h1>
+                    <p class="text-sage-600">Nurturing your body and mind along your journey, Nkeiruka.</p>
+                </div>
+                <button onclick="openHabitModal()" class="bg-rosewood-500 hover:bg-rosewood-600 text-white font-medium px-4 py-2.5 rounded-xl text-sm shadow-sm transition-all">+ Add Custom Habit</button>
+            </header>
+
+            <div id="habitWorkspaceGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </section>
+
+        <section id="prayer" class="page space-y-8">
+            <header>
+                <h1 class="text-3xl font-bold text-gray-900">Rosemary's Prayer Wall</h1>
+                <p class="text-sage-600">Cast your burdens upon Him, for He cares deeply for you.</p>
+            </header>
+
+            <div class="bg-white p-3.5 rounded-xl border border-sage-100 shadow-sm flex gap-3">
+                <input type="text" id="prayer-input" placeholder="Write out a heart petition or praise request..." class="flex-grow bg-gray-50 border border-gray-100 outline-none px-4 rounded-xl text-sm focus:ring-2 focus:ring-rosewood-100 focus:bg-white transition-all">
+                <button onclick="addNewPrayerRequest()" class="bg-rosewood-500 hover:bg-rosewood-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-sm">
+                    Place on Wall
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-rosewood-400"></span> Active Petitions
+                    </h3>
+                    <div id="active-prayers" class="space-y-3"></div>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-sage-500"></span> Answered & Praises
+                    </h3>
+                    <div id="answered-prayers" class="space-y-3"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="milestones" class="page space-y-8">
+            <header>
+                <h1 class="text-3xl font-bold text-gray-900">Growth & Milestones</h1>
+                <p class="text-sage-600">Every small step builds a beautiful life of devotion.</p>
+            </header>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 border border-sage-100 shadow-sm text-center space-y-3">
+                    <div class="w-12 h-12 bg-rosewood-50 rounded-full flex items-center justify-center text-rosewood-500 text-xl mx-auto"><i class="fa-solid fa-star"></i></div>
+                    <h3 class="font-bold text-gray-900">Word Starter</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">Unlocked automatically upon starting your structured chronological daily reading journeys.</p>
+                    <span class="inline-block text-[10px] font-bold bg-rosewood-100 text-rosewood-700 px-3 py-1 rounded-full uppercase tracking-wider">Active Path</span>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-sage-100 shadow-sm text-center space-y-3 opacity-60">
+                    <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 text-xl mx-auto"><i class="fa-solid fa-fire"></i></div>
+                    <h3 class="font-bold text-gray-900">Devoted Consistency</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">Unlocked by maintaining an active custom tracking streak across your dashboard habits for a whole week.</p>
+                    <span class="inline-block text-[10px] font-bold bg-gray-100 text-gray-600 px-3 py-1 rounded-full uppercase tracking-wider">In Progress</span>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-sage-100 shadow-sm text-center space-y-3 opacity-60">
+                    <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 text-xl mx-auto"><i class="fa-solid fa-scroll"></i></div>
+                    <h3 class="font-bold text-gray-900">Proverbs Wisdom</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">Unlocked when you fully dive into and complete deep specialized topical keyword study notes profiles.</p>
+                    <span class="inline-block text-[10px] font-bold bg-gray-100 text-gray-600 px-3 py-1 rounded-full uppercase tracking-wider">Locked</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="habitModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-200">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl border border-sage-100">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Create a New Habit</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Habit Name</label>
+                    <input type="text" id="newHabitName" placeholder="e.g., Hydration, Scripture Memory..." class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-rosewood-400 focus:bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Tracking Format</label>
+                    <select id="newHabitType" onchange="toggleModalFields(this.value)" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-rosewood-400 focus:bg-white">
+                        <option value="binary">Simple Checkbox (Done / Undone)</option>
+                        <option value="quantifiable">Quantifiable Counter (Set Targets)</option>
+                    </select>
+                </div>
+                <div id="modalQuantifiableFields" class="grid grid-cols-2 gap-4 hidden">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Daily Target</label>
+                        <input type="number" id="newHabitTarget" value="1" min="1" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500 mb-1">Unit</label>
+                        <input type="text" id="newHabitUnit" placeholder="e.g., ml, pages, mins" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="closeHabitModal()" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</button>
+                <button onclick="submitNewHabit()" class="px-5 py-2 bg-rosewood-500 hover:bg-rosewood-600 text-white font-medium text-sm rounded-xl shadow-sm">Save Habit</button>
+            </div>
         </div>
-      </form>
     </div>
-  </div>
 
-  <script src="app.js"></script>
+    <script>
+        const devotionalContent = {
+            verse: "Abide in me, and I in you. As the branch cannot bear fruit of itself, except it abide in the vine; no more can ye, except ye abide in me.",
+            ref: "John 15:4",
+            reading: "John Chapter 15",
+            title: "Abiding in the Vine",
+            body: [
+                "In John 15, Jesus uses the beautiful imagery of the True Vine. He reminds us that true Christian growth and spiritual maturity do not come from exhausting ourselves or trying to force production through sheer willpower.",
+                "Abiding simply means to stay. It is an intentional rest. It means slowing down your thoughts, staying connected to Him through prayer, and allowing His life-giving grace to flow through your day naturally.",
+                "Nkeiruka, whenever today begins to feel loud, frantic, or overwhelming, pause for ten seconds. Take a deep breath and remind your heart: 'I am the branch, and He is my strong vine. My only job right now is to lean into Him.'"
+            ]
+        };
+
+        const todayString = new Date().toISOString().split('T')[0];
+
+        // Core Consolidated App Engine State (Syncs Devotional Framework + Custom Habits Data Matrix)
+        let appData = JSON.parse(localStorage.getItem('sanctuary_master_store')) || {
+            habits: [
+                { id: 'h1', name: 'Drink 3L Water 💧', type: 'quantifiable', target: 3000, unit: 'ml', history: {}, currentStreak: 0 },
+                { id: 'h2', name: 'Morning Gratitude ☀️', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 },
+                { id: 'h3', name: 'Scripture Meditation 📖', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 }
+            ],
+            prayers: [
+                { id: 1, text: "Praying for perfect clarity, guidance, and peace over my upcoming personal goals.", status: 'active' },
+                { id: 2, text: "Praise God for His continuous grace, protection, and unconditional love over my life.", status: 'answered' }
+            ],
+            soap: { s: '', o: '', a: '', p: '' },
+            readingComplete: false
+        };
+
+        function saveState() {
+            localStorage.setItem('sanctuary_master_store', JSON.stringify(appData));
+        }
+
+        // Single Page Navigation Engine
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.getAttribute('data-page') === pageId) {
+                    btn.classList.add('bg-rosewood-50', 'text-rosewood-500');
+                    btn.classList.remove('text-gray-500', 'hover:bg-sage-50');
+                } else {
+                    btn.classList.remove('bg-rosewood-50', 'text-rosewood-500');
+                    btn.classList.add('text-gray-500', 'hover:bg-sage-50');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initGreetingAndDates();
+            loadDevotionalView();
+            renderAdvancedHabits();
+            renderPrayerWall();
+            loadSoapNotes();
+            renderHeatmapMatrix();
+        });
+
+        function initGreetingAndDates() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greet = "Good Morning, Nkeiruka ✨";
+            if(hour >= 12 && hour < 17) greet = "Blessed Afternoon, Rosemary ☀️";
+            else if(hour >= 17 || hour < 4) greet = "Rest Well Tonight, Nkeiruka 🌙";
+
+            document.getElementById('dynamic-greeting').innerText = greet;
+            document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function loadDevotionalView() {
+            document.getElementById('dashboard-verse').innerText = `"${devotionalContent.verse}"`;
+            document.getElementById('dashboard-reference').innerText = `— ${devotionalContent.ref}`;
+            document.getElementById('dashboard-reading-chapter').innerText = devotionalContent.reading;
+            document.getElementById('devotion-title').innerHTML = `<i class="fa-solid fa-feather-pointed text-rosewood-500"></i> ${devotionalContent.title}`;
+            
+            const b = document.getElementById('devotion-body');
+            b.innerHTML = '';
+            devotionalContent.body.forEach(p => {
+                const el = document.createElement('p');
+                el.innerText = p;
+                b.appendChild(el);
+            });
+
+            document.getElementById('reading-plan-container').innerHTML = `
+                <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 hover:bg-sage-50/50 cursor-pointer transition-all">
+                    <span class="text-sm font-semibold text-gray-700">${devotionalContent.reading} — Deep Study Chapter</span>
+                    <input type="checkbox" onchange="appData.readingComplete = this.checked; saveState(); renderHeatmapMatrix();" ${appData.readingComplete ? 'checked' : ''} class="w-5 h-5 text-rosewood-500 focus:ring-rosewood-400 accent-rosewood-500">
+                </label>
+            `;
+        }
+
+        // ================= UPGRADED HABIT ADVANCED RENDERING ENGINE =================
+        function renderAdvancedHabits() {
+            const grid = document.getElementById('habitWorkspaceGrid');
+            grid.innerHTML = '';
+
+            appData.habits.forEach(habit => {
+                const progress = habit.history[todayString] || 0;
+                const isDone = progress >= habit.target;
+
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-2xl p-5 border shadow-sm flex flex-col justify-between transition-all ${isDone ? 'border-emerald-200 bg-emerald-50/10' : 'border-sage-100'}`;
+
+                if(habit.type === 'binary') {
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="font-bold text-gray-800 text-base leading-snug">${habit.name}</h4>
+                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full shrink-0">🔥 ${habit.currentStreak}d</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-gray-50/50 border border-gray-100 p-3 rounded-xl">
+                            <span class="text-xs font-medium text-gray-500">${isDone ? 'Completed Today' : 'Mark Complete'}</span>
+                            <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleBinaryHabit('${habit.id}', this.checked)" class="w-5 h-5 text-rosewood-500 accent-rosewood-500 rounded cursor-pointer">
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="font-bold text-gray-800 text-base leading-snug">${habit.name}</h4>
+                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full shrink-0">🔥 ${habit.currentStreak}d</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-gray-50/50 border border-gray-100 p-3 rounded-xl">
+                            <div class="text-sm font-bold text-gray-700">${progress} <span class="text-xs font-medium text-gray-400">/ ${habit.target} ${habit.unit}</span></div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="incrementQuantifiableHabit('${habit.id}', -1)" class="w-7 h-7 bg-white hover:bg-gray-100 border border-gray-200 text-gray-600 rounded-lg flex items-center justify-center text-sm font-bold shadow-sm">-</button>
+                                <button onclick="incrementQuantifiableHabit('${habit.id}', 1)" class="w-7 h-7 bg-white hover:bg-gray-100 border border-gray-200 text-gray-600 rounded-lg flex items-center justify-center text-sm font-bold shadow-sm">+</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleBinaryHabit(id, checked) {
+            const h = appData.habits.find(x => x.id === id);
+            if(h) {
+                h.history[todayString] = checked ? 1 : 0;
+                recalcStreak(h);
+                saveState();
+                renderAdvancedHabits();
+                renderHeatmapMatrix();
+            }
+        }
+
+        function incrementQuantifiableHabit(id, action) {
+            const h = appData.habits.find(x => x.id === id);
+            if(h) {
+                const current = h.history[todayString] || 0;
+                // Steps logic: changes value dynamically based on step scales
+                const step = h.target > 100 ? 250 : 1;
+                h.history[todayString] = Math.max(0, current + (action * step));
+                recalcStreak(h);
+                saveState();
+                renderAdvancedHabits();
+                renderHeatmapMatrix();
+            }
+        }
+
+        function recalcStreak(habit) {
+            let streak = 0;
+            let d = new Date();
+            while(true) {
+                const dStr = d.toISOString().split('T')[0];
+                const progress = habit.history[dStr] || 0;
+                if(progress >= habit.target) {
+                    streak++;
+                    d.setDate(d.getDate() - 1);
+                } else {
+                    if(dStr === todayString) {
+                        d.setDate(d.getDate() - 1);
+                        continue;
+                    }
+                    break;
+                }
+            }
+            habit.currentStreak = streak;
+        }
+
+        // ================= 365-DAY DYNAMIC HEATMAP MATRIX ENGINE =================
+        function renderHeatmapMatrix() {
+            const grid = document.getElementById('heatmapGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+
+            const total = appData.habits.length;
+            const today = new Date();
+            const dates = [];
+
+            for (let i = 364; i >= 0; i--) {
+                const cur = new Date();
+                cur.setDate(today.getDate() - i);
+                dates.push(cur);
+            }
+
+            dates.forEach(date => {
+                const dStr = date.toISOString().split('T')[0];
+                let doneCount = 0;
+
+                appData.habits.forEach(h => {
+                    if((h.history[dStr] || 0) >= h.target) doneCount++;
+                });
+
+                let level = 0;
+                if(total > 0 && doneCount > 0) {
+                    const ratio = doneCount / total;
+                    if(ratio <= 0.34) level = 1;
+                    else if(ratio <= 0.74) level = 2;
+                    else level = 3;
+                }
+
+                const sq = document.createElement('div');
+                sq.className = `heat-square level-${level}`;
+                sq.setAttribute('data-tooltip', `${date.toLocaleDateString('en-US', {month:'short', day:'numeric'})}: ${doneCount}/${total} Done`);
+                grid.appendChild(sq);
+            });
+        }
+
+        // ================= MODAL INTERACTIVE WINDOW LOGIC =================
+        function openHabitModal() {
+            const m = document.getElementById('habitModal');
+            m.classList.remove('opacity-0', 'pointer-events-none');
+            m.classList.add('opacity-100', 'pointer-events-auto');
+        }
+        function closeModalHabit() {
+            const m = document.getElementById('habitModal');
+            m.classList.add('opacity-0', 'pointer-events-none');
+            m.classList.remove('opacity-100', 'pointer-events-auto');
+        }
+        window.closeHabitModal = closeModalHabit;
+
+        function toggleModalFields(val) {
+            document.getElementById('modalQuantifiableFields').style.display = val === 'quantifiable' ? 'grid' : 'none';
+        }
+
+        function submitNewHabit() {
+            const name = document.getElementById('newHabitName').value.trim();
+            const type = document.getElementById('newHabitType').value;
+            const target = document.getElementById('newHabitTarget').value;
+            const unit = document.getElementById('newHabitUnit').value.trim() || 'units';
+
+            if(!name) return alert("Please enter a valid name.");
+
+            appData.habits.push({
+                id: 'h_' + Date.now(),
+                name: name,
+                type: type,
+                target: type === 'binary' ? 1 : Number(target),
+                unit: type === 'binary' ? 'status' : unit,
+                history: {},
+                currentStreak: 0
+            });
+
+            document.getElementById('newHabitName').value = '';
+            saveState();
+            closeModalHabit();
+            renderAdvancedHabits();
+            renderHeatmapMatrix();
+        }
+
+        // ================= DATA PIPELINE BACKUP ENGINE (JSON EXPORT/IMPORT) =================
+        window.exportDataEngine = function() {
+            const str = JSON.stringify(appData);
+            const blob = new Blob([str], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nkeiruka_sanctuary_backup_${todayString}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        window.importDataEngine = function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if(!parsed.habits || !parsed.prayers || !parsed.soap) throw new Error("Invalid structure data layout.");
+                    if(confirm("Restore this backup? This merges and replaces active digital journal records.")) {
+                        appData = parsed;
+                        saveState();
+                        initGreetingAndDates();
+                        loadDevotionalView();
+                        renderAdvancedHabits();
+                        renderPrayerWall();
+                        loadSoapNotes();
+                        renderHeatmapMatrix();
+                        alert("Sanctuary logs completely updated! ✨");
+                    }
+                } catch(err) { alert("Error reading system file profile."); }
+            };
+            reader.readAsText(file);
+        };
+
+        // ================= PRAYER WALL METHODS =================
+        function renderPrayerWall() {
+            const act = document.getElementById('active-prayers');
+            const ans = document.getElementById('answered-prayers');
+            act.innerHTML = ''; ans.innerHTML = '';
+
+            appData.prayers.forEach(p => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl border border-sage-100 shadow-sm flex justify-between items-center gap-4";
+                if(p.status === 'active') {
+                    div.innerHTML = `
+                        <p class="text-sm text-gray-700 font-medium">"${p.text}"</p>
+                        <button onclick="resolvePrayer(${p.id})" class="text-gray-300 hover:text-sage-600 transition-colors shrink-0"><i class="fa-solid fa-circle-check text-lg"></i></button>
+                    `;
+                    act.appendChild(div);
+                } else {
+                    div.innerHTML = `
+                        <p class="text-sm text-gray-400 line-through font-medium">"${p.text}"</p>
+                        <span class="text-sage-600 text-[10px] font-bold bg-sage-50 px-2 py-0.5 rounded uppercase border border-sage-100 shrink-0">Praise God</span>
+                    `;
+                    ans.appendChild(div);
+                }
+            });
+        }
+
+        function addNewPrayerRequest() {
+            const el = document.getElementById('prayer-input');
+            const val = el.value.trim();
+            if(!val) return;
+            appData.prayers.push({ id: Date.now(), text: val, status: 'active' });
+            el.value = '';
+            saveState();
+            renderPrayerWall();
+        }
+
+        function resolvePrayer(id) {
+            const p = appData.prayers.find(x => x.id === id);
+            if(p) { p.status = 'answered'; saveState(); renderPrayerWall(); }
+        }
+
+        // ================= SOAP DEVOTIONAL JOURNAL METHODS =================
+        function loadSoapNotes() {
+            document.getElementById('soap-s').value = appData.soap.s || '';
+            document.getElementById('soap-o').value = appData.soap.o || '';
+            document.getElementById('soap-a').value = appData.soap.a || '';
+            document.getElementById('soap-p').value = appData.soap.p || '';
+        }
+
+        function saveSoapEntry() {
+            appData.soap.s = document.getElementById('soap-s').value;
+            appData.soap.o = document.getElementById('soap-o').value;
+            appData.soap.a = document.getElementById('soap-a').value;
+            appData.soap.p = document.getElementById('soap-p').value;
+            saveState();
+            alert("Nkeiruka, your study reflection notes have been safely logged! ✨");
+        }
+    </script>
 </body>
 </html>
