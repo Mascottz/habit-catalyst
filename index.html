@@ -416,13 +416,12 @@
     </div>
 
     <script>
-        // ================= UPGRADE 1: PERPETUAL 365-DAY SCRIPTURE & STUDY MATRIX =================
+        // ================= PERPETUAL 365-DAY SCRIPTURE & STUDY MATRIX =================
         const perpetualDevotionalMatrix = {
             1: { verse: "In the beginning God created the heaven and the earth.", ref: "Genesis 1:1", reading: "Genesis 1", title: "The God of Beginnings", paragraphs: ["Every beautiful story, every season of growth, and every clean slate begins in the hands of God.", "Rosemary, whatever you are starting today, know that the Creator is shaping your foundation with infinite care."] },
             145: { verse: "Abide in me, and I in you. As the branch cannot bear fruit of itself, except it abide in the vine; no more can ye, except ye abide in me.", ref: "John 15:4", reading: "John 15", title: "Abiding in the True Vine", paragraphs: ["True transformation does not happen through frantic striving; it flows from staying close to the Source.", "Nkeiruka, rest in the reassurance that you are simply the branch. Let His grace carry your weight today."] },
             149: { verse: "Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you.", ref: "John 14:27", reading: "John 14", title: "A Peace the World Cannot Fake", paragraphs: ["The world offers temporary quiet, but Christ implants a structural, unshakeable peace deep within the soul.", "When things feel complex around you, take a slow breath. His peace is actively guarding your path."] },
             365: { verse: "The Lord bless thee, and keep thee: The Lord make his face shine upon thee...", ref: "Numbers 6:24-25", reading: "Numbers 6", title: "The Full Circle Blessing", paragraphs: ["You are perfectly preserved, sustained, and fiercely loved through every milestone of this year.", "Look back at the legacy map of your journey and step forward into tomorrow with your head held high."]
-            // The JavaScript logic below includes a dynamic algorithmic loop fallback protector to ensure all 365 calendar variations gracefully generate automatic beautiful study options even when indexes are sparse.
         };
 
         // Complete 66-Book Structural Matrix Map containing full maximum indexing data parameters for client dropdown generation
@@ -498,7 +497,6 @@
             document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
 
-        // Calculates current day index of the year ($1 - 365$) to drive perpetual rotation matrix cleanly
         function getDayOfYearIndex() {
             const now = new Date();
             const start = new Date(now.getFullYear(), 0, 0);
@@ -509,7 +507,6 @@
 
         function loadPerpetualDevotionalEngine() {
             const dayIndex = getDayOfYearIndex();
-            // Fetch matching index; fallback algorithm selects index 145 if standard data point is blank
             const content = perpetualDevotionalMatrix[dayIndex] || perpetualDevotionalMatrix[145];
 
             document.getElementById('dashboard-verse').innerText = `"${content.verse}"`;
@@ -533,7 +530,7 @@
             `;
         }
 
-        // ================= UPGRADE 2: FULL BIBLE SCROLL TEXT STREAM ENGINE =================
+        // ================= FULL BIBLE SCROLL TEXT STREAM ENGINE =================
         function buildBibleBrowserDropdowns() {
             const bookSelect = document.getElementById('bible-book-select');
             if(!bookSelect) return;
@@ -571,13 +568,11 @@
             viewTitle.innerText = `${book.name} Chapter ${chapter}`;
 
             try {
-                // Connects to a reliable open-access text stream pipeline (KJV translation default standard optimized layer)
                 const res = await fetch(`https://bible-api.com/${book.name}+${chapter}`);
                 if(!res.ok) throw new Error("Stream offline");
                 const data = await res.json();
                 
                 viewBody.innerHTML = '';
-                // Formats structured list paragraphs with clean verse alignment markings
                 data.verses.forEach(v => {
                     const p = document.createElement('p');
                     p.className = "mb-3 tracking-normal text-gray-800";
@@ -585,14 +580,12 @@
                     viewBody.appendChild(p);
                 });
             } catch (err) {
-                // Secure text stream fallback engine allows seamless local reading access during connection shortages
                 viewBody.innerHTML = `
                     <div class="p-4 rounded-xl bg-orange-50 text-orange-800 text-sm font-medium border border-orange-100">
                         ⚠️ <strong>Connection Shield Active:</strong> The scroll pipeline is currently experiencing network delays in your area. Open up your physical scripture pages or try again in a brief second. God's truth remains unshakeable!
                     </div>
                 `;
             } finally {
-                loader.add('hidden');
                 loader.classList.add('hidden');
             }
         }
@@ -607,7 +600,7 @@
                 anxious: "⛈️ 'Do not be anxious about anything, but in every situation... present your requests to God.' (Philippians 4:6). Breathe deeply, Nkeiruka. Hand over that specific heavy loop to Him right now.",
                 peaceful: "🕊️ 'The peace of God, which transcends all understanding, will guard your heart.' (Philippians 4:7). Praise Him for this calm water today, sweet girl. Let it soak into your actions.",
                 joyful: "☀️ 'The joy of the Lord is your strength.' (Nehemiah 8:10). Let your heart overflow, Rosemary! Write down a quick praise note today to anchor this baseline of gratitude.",
-                seeking: "🔍 'Trust in the Lord with all your heart and lean not on your own understanding.' (Proverbs 3:5). He knows the full map ahead of you in Abuja and beyond. Step out in absolute trust."
+                seeking: "🔍 'Trust in the Lord with all your heart and lean not on your own understanding.' (Proverbs 3:5). He knows the full map ahead of you. Step out in absolute trust."
             };
             card.innerText = alignments[mood] || '';
         }
@@ -739,7 +732,7 @@
                 } else {
                     const block = document.createElement('div'); block.className = "relative pl-6 pb-2 space-y-1";
                     block.innerHTML = `
-                        <div class="absolute left-0 top-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white shadow-sm ring-4 ring-emerald-5  z-10"></div>
+                        <div class="absolute left-0 top-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white shadow-sm ring-4 ring-emerald-5 z-10"></div>
                         <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Answered</span>
                         <p class="text-sm text-gray-800 font-semibold mt-1">"${p.text}"</p>
                         ${p.testimony ? `<p class="text-xs text-gray-500 italic bg-gray-50 p-2.5 rounded-lg border border-gray-100 mt-1"><strong>Rosemary's Testimony:</strong> ${p.testimony}</p>` : ''}
@@ -770,7 +763,7 @@
             appData.prayers.push({ id: Date.now(), text: val, status: 'active', testimony: '' }); el.value = ''; saveState(); renderPrayerWall();
         }
 
-        // ================= CONFIG SYSTEM BACKEND MANAGEMENT MODULES =================
+        // ================= CONFIG SYSTEM MANAGEMENT MODULES =================
         function openHabitModal() { const m = document.getElementById('habitModal'); m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
         function closeModalHabit() { const m = document.getElementById('habitModal'); m.classList.add('opacity-0', 'pointer-events-none'); }
         window.closeHabitModal = closeModalHabit;
