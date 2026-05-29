@@ -74,6 +74,7 @@
 </head>
 <body class="bg-gradient-to-br from-cream-50 via-sage-50 to-rosewood-50 min-h-screen text-gray-800 font-sans pb-24 md:pb-6 md:pl-64">
 
+    <!-- DESKTOP NAV -->
     <nav class="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 bg-white border-r border-sage-100 p-6 justify-between z-10">
         <div>
             <div class="flex items-center gap-3 mb-10 px-2">
@@ -111,7 +112,7 @@
         <div class="space-y-4 border-t border-gray-100 pt-4">
             <div class="flex items-center gap-2 px-2">
                 <button onclick="exportDataEngine()" class="text-[11px] font-semibold bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1">💾 Export</button>
-                <label class="text-[11px] font-semibold bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1">
+            <label class="text-[11px] font-semibold bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1">
                     📂 Import
                     <input type="file" accept=".json" onchange="importDataEngine(event)" class="hidden">
                 </label>
@@ -120,6 +121,7 @@
         </div>
     </nav>
 
+    <!-- MOBILE NAV -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-sage-100 flex justify-around py-3 z-10 px-2 shadow-lg">
         <button onclick="switchPage('dashboard')" class="mobile-nav-btn flex flex-col items-center gap-1 text-rosewood-500" data-page="dashboard"><i class="fa-solid fa-house-chimney text-lg"></i><span class="text-[10px] font-semibold">Home</span></button>
         <button onclick="switchPage('devotion')" class="mobile-nav-btn flex flex-col items-center gap-1 text-gray-400" data-page="devotion"><i class="fa-solid fa-book-open text-lg"></i><span class="text-[10px] font-semibold">Word</span></button>
@@ -130,6 +132,7 @@
 
     <main class="max-w-5xl mx-auto px-4 py-8 md:py-12">
 
+        <!-- DASHBOARD -->
         <section id="dashboard" class="page space-y-8 block">
             <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -178,7 +181,7 @@
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-sage-100 flex items-center justify-between">
                     <div>
                         <h3 class="font-bold text-gray-900 text-lg">Today's Focus Chapter</h3>
-                        <p class="text-sm text-gray-500 mt-1">Reading: <span id="dashboard-reading-chapter" class="font-semibold text-rosewood-500">...</span></p>
+                        <p class="text-sm text-gray-500 mt-1">Reading: <span id="dashboard-reading-chapter" class="font-semibold text-rosewood-500">John 3</span></p>
                     </div>
                     <button onclick="switchPage('devotion')" class="w-10 h-10 rounded-full bg-rosewood-50 hover:bg-rosewood-100 flex items-center justify-center text-rosewood-600 transition-colors">
                         <i class="fa-solid fa-arrow-right"></i>
@@ -194,6 +197,7 @@
             </div>
         </section>
 
+        <!-- DEVOTION -->
         <section id="devotion" class="page space-y-8 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">Word & Devotion</h1>
@@ -217,8 +221,10 @@
                     </div>
 
                     <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-sage-100 space-y-4">
-                        <h2 id="devotion-title" class="text-xl font-bold text-gray-900 flex items-center gap-2"></h2>
-                        <div id="devotion-body" class="text-gray-600 leading-relaxed space-y-3"></div>
+                        <h2 id="devotion-title" class="text-xl font-bold text-gray-900 flex items-center gap-2">Today's Devotion</h2>
+                        <div id="devotion-body" class="text-gray-600 leading-relaxed space-y-3">
+                            <p>Use this space to reflect on today's scripture, write insights, and let the Word dwell richly in your heart.</p>
+                        </div>
                     </div>
 
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-sage-100 space-y-4">
@@ -233,7 +239,9 @@
 
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-sage-100">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2"><i class="fa-solid fa-calendar-check text-rosewood-500"></i> Daily Reading Goal</h3>
-                        <div id="reading-plan-container"></div>
+                        <div id="reading-plan-container" class="text-sm text-gray-600">
+                            Aim to read at least one focused chapter today. Let the Focus Chapter above be your meditation anchor.
+                        </div>
                     </div>
                 </div>
 
@@ -266,6 +274,7 @@
             </div>
         </section>
 
+        <!-- BIBLE BROWSER -->
         <section id="bibleBrowser" class="page space-y-6 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">The Scroll</h1>
@@ -302,6 +311,7 @@
             </div>
         </section>
 
+        <!-- HABITS -->
         <section id="habits" class="page space-y-8 hidden">
             <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -313,6 +323,7 @@
             <div id="habitWorkspaceGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
+        <!-- PRAYER -->
         <section id="prayer" class="page space-y-8 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">Prayer Wall & Testimony Archives</h1>
@@ -337,6 +348,7 @@
             </div>
         </section>
 
+        <!-- MILESTONES -->
         <section id="milestones" class="page space-y-8 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">Growth & Milestones</h1>
@@ -366,6 +378,7 @@
         </section>
     </main>
 
+    <!-- TESTIMONY MODAL -->
     <div id="testimonyModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-200">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl border border-sage-100">
             <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg mb-3"><i class="fa-solid fa-sun"></i></div>
@@ -380,6 +393,7 @@
         </div>
     </div>
 
+    <!-- HABIT MODAL -->
     <div id="habitModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-200">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl border border-sage-100">
             <h3 class="text-lg font-bold text-gray-900 mb-4">Create a New Habit</h3>
@@ -413,18 +427,29 @@
         </div>
     </div>
 
-  <script>
+<script>
 /* ================= CORE STATE ENGINE ================= */
 
 const STORAGE_KEY = "sanctuary_app_data_v1";
 
-let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-    habits: [],
-    prayers: [],
-    answeredPrayers: [],
-    soapEntries: [],
-    heatmap: {}
-};
+let appData;
+try {
+    appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+        habits: [],
+        prayers: [],
+        answeredPrayers: [],
+        soapEntries: [],
+        heatmap: {}
+    };
+} catch (e) {
+    appData = {
+        habits: [],
+        prayers: [],
+        answeredPrayers: [],
+        soapEntries: [],
+        heatmap: {}
+    };
+}
 
 function saveData() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
@@ -434,12 +459,33 @@ function saveData() {
 
 function switchPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-    document.getElementById(pageId).classList.remove('hidden');
+    const target = document.getElementById(pageId);
+    if (target) target.classList.remove('hidden');
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.dataset.page === pageId) {
+            btn.classList.remove('text-gray-500', 'hover:bg-sage-50', 'hover:text-sage-600');
+            btn.classList.add('text-rosewood-500', 'bg-rosewood-50');
+        } else {
+            btn.classList.remove('text-rosewood-500', 'bg-rosewood-50');
+            btn.classList.add('text-gray-500', 'hover:bg-sage-50', 'hover:text-sage-600');
+        }
+    });
+
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        if (btn.dataset.page === pageId) {
+            btn.classList.remove('text-gray-400');
+            btn.classList.add('text-rosewood-500');
+        } else {
+            btn.classList.remove('text-rosewood-500');
+            btn.classList.add('text-gray-400');
+        }
+    });
 }
 
 /* ================= GREETING ================= */
 
-(function initGreeting() {
+function initGreeting() {
     const el = document.getElementById("dynamic-greeting");
     const dateEl = document.getElementById("current-date");
 
@@ -450,12 +496,13 @@ function switchPage(pageId) {
 
     if (el) el.textContent = `${g}, Nkeiruka ✨`;
     if (dateEl) dateEl.textContent = new Date().toDateString();
-})();
+}
 
 /* ================= SOUL ALIGN ================= */
 
 function alignSoul(state) {
     const el = document.getElementById("soul-alignment-card");
+    if (!el) return;
 
     const map = {
         weary: "Matthew 11:28 — Come to me, all who are weary.",
@@ -465,7 +512,7 @@ function alignSoul(state) {
         seeking: "Jeremiah 33:3 — Call unto Me and I will answer."
     };
 
-    el.textContent = map[state];
+    el.textContent = map[state] || "";
     el.classList.remove("hidden");
 }
 
@@ -481,13 +528,18 @@ function exportDataEngine() {
 
 function importDataEngine(e) {
     const file = e.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
 
     reader.onload = () => {
-        appData = JSON.parse(reader.result);
-        saveData();
-        alert("Imported successfully");
-        location.reload();
+        try {
+            appData = JSON.parse(reader.result);
+            saveData();
+            alert("Imported successfully");
+            location.reload();
+        } catch (err) {
+            alert("Invalid file format");
+        }
     };
 
     reader.readAsText(file);
@@ -497,11 +549,11 @@ function importDataEngine(e) {
 
 function addNewPrayerRequest() {
     const input = document.getElementById("prayer-input");
-    if (!input.value.trim()) return;
+    if (!input || !input.value.trim()) return;
 
     appData.prayers.push({
         id: Date.now(),
-        text: input.value,
+        text: input.value.trim(),
         date: new Date().toLocaleDateString()
     });
 
@@ -519,29 +571,67 @@ function renderPrayers() {
     active.innerHTML = "";
     answered.innerHTML = "";
 
+    if (appData.prayers.length === 0) {
+        active.innerHTML = `<p class="text-xs text-gray-400 italic">No active petitions yet. Lay one at His feet today.</p>`;
+    }
+
     appData.prayers.forEach(p => {
         active.innerHTML += `
-            <div class="bg-white p-3 rounded-xl border flex justify-between">
-                <span>${p.text}</span>
-                <button onclick="markAnswered(${p.id})">✔</button>
+            <div class="bg-white p-3 rounded-xl border border-sage-100 flex justify-between items-start gap-3">
+                <div class="flex-1">
+                    <p class="text-sm text-gray-700">${p.text}</p>
+                    <span class="text-[10px] text-gray-400 mt-1 inline-block">${p.date}</span>
+                </div>
+                <button onclick="openTestimonyModal(${p.id})" class="text-[11px] font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-check"></i> Answered
+                </button>
             </div>
         `;
     });
 
+    if (appData.answeredPrayers.length === 0) {
+        answered.innerHTML = `<p class="text-xs text-gray-400 italic">No testimonies logged yet. Your Hallelujah stories will appear here.</p>`;
+    }
+
     appData.answeredPrayers.forEach(p => {
         answered.innerHTML += `
-            <div class="text-sm border-l-2 pl-2">${p.text}</div>
+            <div class="bg-white rounded-xl p-3 border border-emerald-100 shadow-sm text-sm">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-semibold text-emerald-700">Answered • ${p.date || ""}</span>
+                </div>
+                <p class="text-gray-700 mb-2">${p.text}</p>
+                ${p.testimony ? `<p class="text-xs text-gray-500 italic">“${p.testimony}”</p>` : ""}
+            </div>
         `;
     });
 }
 
-function markAnswered(id) {
-    const index = appData.prayers.findIndex(p => p.id === id);
-    const item = appData.prayers.splice(index, 1)[0];
-    appData.answeredPrayers.push(item);
+function openTestimonyModal(id) {
+    const modal = document.getElementById("testimonyModal");
+    document.getElementById("target-prayer-id").value = id;
+    document.getElementById("testimony-note").value = "";
+    modal.classList.remove("opacity-0", "pointer-events-none");
+}
 
-    saveData();
-    renderPrayers();
+function closeTestimonyModal() {
+    const modal = document.getElementById("testimonyModal");
+    modal.classList.add("opacity-0", "pointer-events-none");
+}
+
+function submitTestimony() {
+    const id = parseInt(document.getElementById("target-prayer-id").value, 10);
+    const note = document.getElementById("testimony-note").value.trim();
+
+    const index = appData.prayers.findIndex(p => p.id === id);
+    if (index !== -1) {
+        const item = appData.prayers.splice(index, 1)[0];
+        item.testimony = note;
+        appData.answeredPrayers.push(item);
+
+        saveData();
+        renderPrayers();
+        closeTestimonyModal();
+    }
 }
 
 /* ================= HABITS ================= */
@@ -554,16 +644,46 @@ function closeHabitModal() {
     document.getElementById("habitModal").classList.add("opacity-0","pointer-events-none");
 }
 
-function submitNewHabit() {
-    const name = document.getElementById("newHabitName").value;
+function toggleModalFields(value) {
+    const fields = document.getElementById("modalQuantifiableFields");
+    if (!fields) return;
+    if (value === "quantifiable") {
+        fields.classList.remove("hidden");
+    } else {
+        fields.classList.add("hidden");
+    }
+}
 
+function submitNewHabit() {
+    const nameEl = document.getElementById("newHabitName");
+    const typeEl = document.getElementById("newHabitType");
+    const targetEl = document.getElementById("newHabitTarget");
+    const unitEl = document.getElementById("newHabitUnit");
+
+    const name = nameEl.value.trim();
     if (!name) return;
+
+    const type = typeEl.value;
+    let target = null;
+    let unit = null;
+
+    if (type === "quantifiable") {
+        target = parseFloat(targetEl.value) || 1;
+        unit = unitEl.value.trim() || "";
+    }
 
     appData.habits.push({
         id: Date.now(),
         name,
+        type,
+        target,
+        unit,
         logs: {}
     });
+
+    nameEl.value = "";
+    targetEl.value = 1;
+    unitEl.value = "";
 
     saveData();
     renderHabits();
@@ -573,12 +693,20 @@ function submitNewHabit() {
 function toggleHabit(id) {
     const today = new Date().toISOString().split("T")[0];
     const habit = appData.habits.find(h => h.id === id);
+    if (!habit) return;
 
-    habit.logs[today] = !habit.logs[today];
+    if (habit.type === "binary") {
+        habit.logs[today] = !habit.logs[today];
+        if (habit.logs[today]) updateHeatmap(today);
+    } else {
+        const current = habit.logs[today] || 0;
+        habit.logs[today] = current + 1;
+        updateHeatmap(today);
+    }
 
-    updateHeatmap(today);
     saveData();
     renderHabits();
+    renderHeatmap();
 }
 
 function renderHabits() {
@@ -587,11 +715,37 @@ function renderHabits() {
 
     grid.innerHTML = "";
 
+    if (appData.habits.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-gray-400 italic">No habits yet. Start by adding one to your temple routine.</p>`;
+        return;
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
     appData.habits.forEach(h => {
+        const todayValue = h.logs[today] || (h.type === "binary" ? false : 0);
+        const isDone = h.type === "binary" ? !!todayValue : todayValue >= (h.target || 1);
+
         grid.innerHTML += `
-        <div class="p-4 border rounded-xl">
-            <h3>${h.name}</h3>
-            <button onclick="toggleHabit(${h.id})">Toggle Today</button>
+        <div class="p-4 border border-sage-100 rounded-xl bg-white shadow-sm flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-gray-800">${h.name}</h3>
+                <span class="text-[10px] uppercase tracking-wide text-gray-400">${h.type === "binary" ? "Checkbox" : "Counter"}</span>
+            </div>
+            <div class="flex items-center justify-between">
+                ${
+                    h.type === "binary"
+                    ? `<button onclick="toggleHabit(${h.id})" class="text-xs font-semibold px-3 py-1.5 rounded-full ${
+                        isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                    }">${isDone ? "Done Today" : "Mark Done"}</button>`
+                    : `<button onclick="toggleHabit(${h.id})" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-rosewood-50 text-rosewood-600">+ Add</button>`
+                }
+                ${
+                    h.type === "quantifiable"
+                    ? `<span class="text-xs text-gray-500">${todayValue}/${h.target || 1} ${h.unit || ""}</span>`
+                    : ""
+                }
+            </div>
         </div>`;
     });
 }
@@ -600,41 +754,145 @@ function renderHabits() {
 
 function updateHeatmap(date) {
     appData.heatmap[date] = (appData.heatmap[date] || 0) + 1;
+    saveData();
+}
+
+function renderHeatmap() {
+    const grid = document.getElementById("heatmapGrid");
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - 364);
+    
+    for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split("T")[0];
+        const count = appData.heatmap[dateStr] || 0;
+        let levelClass = 'level-0';
+        if (count === 1) levelClass = 'level-1';
+        else if (count === 2) levelClass = 'level-2';
+        else if (count >= 3) levelClass = 'level-3';
+        
+        const square = document.createElement("div");
+        square.className = `heat-square ${levelClass}`;
+        square.dataset.tooltip = `${dateStr}: ${count} tracked activities`;
+        grid.appendChild(square);
+    }
 }
 
 /* ================= SOAP ================= */
 
 function saveSoapEntry() {
-    const s = document.getElementById("soap-s").value;
-    const o = document.getElementById("soap-o").value;
-    const a = document.getElementById("soap-a").value;
-    const p = document.getElementById("soap-p").value;
+    const s = document.getElementById("soap-s").value.trim();
+    const o = document.getElementById("soap-o").value.trim();
+    const a = document.getElementById("soap-a").value.trim();
+    const p = document.getElementById("soap-p").value.trim();
 
-    appData.soapEntries.push({s,o,a,p,date:new Date()});
+    if (!s && !o && !a && !p) return;
+
+    appData.soapEntries.push({s,o,a,p,date:new Date().toISOString()});
+
+    document.getElementById("soap-s").value = "";
+    document.getElementById("soap-o").value = "";
+    document.getElementById("soap-a").value = "";
+    document.getElementById("soap-p").value = "";
 
     saveData();
-    alert("Saved");
+    alert("Study entry saved securely on this device.");
 }
 
-/* ================= BIBLE API ================= */
+/* ================= BIBLE DATA / BROWSER ================= */
+
+const BIBLE_BOOKS = [
+    {name: "Genesis", chapters: 50}, {name: "Exodus", chapters: 40}, {name: "Leviticus", chapters: 27},
+    {name: "Numbers", chapters: 36}, {name: "Deuteronomy", chapters: 34}, {name: "Joshua", chapters: 24},
+    {name: "Judges", chapters: 21}, {name: "Ruth", chapters: 4}, {name: "1 Samuel", chapters: 31},
+    {name: "2 Samuel", chapters: 24}, {name: "1 Kings", chapters: 22}, {name: "2 Kings", chapters: 25},
+    {name: "1 Chronicles", chapters: 29}, {name: "2 Chronicles", chapters: 36}, {name: "Ezra", chapters: 10},
+    {name: "Nehemiah", chapters: 13}, {name: "Esther", chapters: 10}, {name: "Job", chapters: 42},
+    {name: "Psalms", chapters: 150}, {name: "Proverbs", chapters: 31}, {name: "Ecclesiastes", chapters: 12},
+    {name: "Song of Solomon", chapters: 8}, {name: "Isaiah", chapters: 66}, {name: "Jeremiah", chapters: 52},
+    {name: "Lamentations", chapters: 5}, {name: "Ezekiel", chapters: 48}, {name: "Daniel", chapters: 12},
+    {name: "Hosea", chapters: 14}, {name: "Joel", chapters: 3}, {name: "Amos", chapters: 9},
+    {name: "Obadiah", chapters: 1}, {name: "Jonah", chapters: 4}, {name: "Micah", chapters: 7},
+    {name: "Nahum", chapters: 3}, {name: "Habakkuk", chapters: 3}, {name: "Zephaniah", chapters: 3},
+    {name: "Haggai", chapters: 2}, {name: "Zechariah", chapters: 14}, {name: "Malachi", chapters: 4},
+    {name: "Matthew", chapters: 28}, {name: "Mark", chapters: 16}, {name: "Luke", chapters: 24},
+    {name: "John", chapters: 21}, {name: "Acts", chapters: 28}, {name: "Romans", chapters: 16},
+    {name: "1 Corinthians", chapters: 16}, {name: "2 Corinthians", chapters: 13}, {name: "Galatians", chapters: 6},
+    {name: "Ephesians", chapters: 6}, {name: "Philippians", chapters: 4}, {name: "Colossians", chapters: 4},
+    {name: "1 Thessalonians", chapters: 5}, {name: "2 Thessalonians", chapters: 3}, {name: "1 Timothy", chapters: 6},
+    {name: "2 Timothy", chapters: 4}, {name: "Titus", chapters: 3}, {name: "Philemon", chapters: 1},
+    {name: "Hebrews", chapters: 13}, {name: "James", chapters: 5}, {name: "1 Peter", chapters: 5},
+    {name: "2 Peter", chapters: 3}, {name: "1 John", chapters: 5}, {name: "2 John", chapters: 1},
+    {name: "3 John", chapters: 1}, {name: "Jude", chapters: 1}, {name: "Revelation", chapters: 22}
+];
+
+function initBibleBrowser() {
+    const bookSelect = document.getElementById("bible-book-select");
+    if (!bookSelect) return;
+    
+    BIBLE_BOOKS.forEach(book => {
+        const option = document.createElement("option");
+        option.value = book.name;
+        option.textContent = book.name;
+        bookSelect.appendChild(option);
+    });
+    
+    bookSelect.value = "John";
+    updateChapterDropdown();
+}
+
+function updateChapterDropdown() {
+    const bookSelect = document.getElementById("bible-book-select");
+    const chapterSelect = document.getElementById("bible-chapter-select");
+    if (!bookSelect || !chapterSelect) return;
+    
+    const selectedBook = BIBLE_BOOKS.find(b => b.name === bookSelect.value);
+    if (!selectedBook) return;
+    
+    chapterSelect.innerHTML = "";
+    for (let i = 1; i <= selectedBook.chapters; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        chapterSelect.appendChild(option);
+    }
+}
 
 async function fetchFullBibleChapter() {
-    const book = document.getElementById("bible-book-select").value;
-    const chapter = document.getElementById("bible-chapter-select").value;
-
+    const bookEl = document.getElementById("bible-book-select");
+    const chapterEl = document.getElementById("bible-chapter-select");
     const body = document.getElementById("bible-view-body");
-    body.innerHTML = "Loading...";
+    const titleEl = document.getElementById("bible-view-title");
+    const loader = document.getElementById("bible-loading-indicator");
+
+    if (!bookEl || !chapterEl || !body || !titleEl) return;
+
+    const book = bookEl.value;
+    const chapter = chapterEl.value;
+
+    titleEl.textContent = `${book} Chapter ${chapter}`;
+    body.innerHTML = "";
+    if (loader) loader.classList.remove("hidden");
 
     try {
-        const res = await fetch(`https://bible-api.com/${book}+${chapter}`);
-        const data = await res.json();
+        const res = await fetch(`https://bible-api.com/${encodeURIComponent(book + " " + chapter)}`);
+        const data = await res.json(); // bible-api.com JSON [web:11]
 
-        body.innerHTML = data.verses.map(v =>
-            `<p><b>${v.verse}</b> ${v.text}</p>`
-        ).join("");
-
-    } catch {
-        body.innerHTML = "Failed to load scripture.";
+        if (!data.verses || !Array.isArray(data.verses)) {
+            body.innerHTML = `<p class="text-sm text-gray-500">Unable to load this chapter at the moment.</p>`;
+        } else {
+            body.innerHTML = data.verses.map(v =>
+                `<p><span class="font-semibold text-rosewood-500 mr-1">${v.verse}</span>${v.text}</p>`
+            ).join("");
+        }
+    } catch (e) {
+        body.innerHTML = `<p class="text-sm text-gray-500">Failed to load scripture. Please check your internet connection and try again.</p>`;
+    } finally {
+        if (loader) loader.classList.add("hidden");
     }
 }
 
@@ -642,14 +900,15 @@ async function fetchFullBibleChapter() {
 
 function fetchTopicalVerse(topic) {
     const el = document.getElementById("topical-output");
+    if (!el) return;
 
     const verses = {
-        peace: "John 14:27 — Peace I leave with you.",
-        faith: "Hebrews 11:1 — Faith is the substance...",
-        love: "1 Corinthians 13 — Love is patient..."
+        peace: "John 14:27 — “Peace I leave with you; my peace I give to you.”",
+        faith: "Hebrews 11:1 — “Now faith is the substance of things hoped for, the evidence of things not seen.”",
+        love: "1 John 4:18 — “There is no fear in love; but perfect love casts out fear.”"
     };
 
-    el.textContent = verses[topic];
+    el.textContent = verses[topic] || "";
     el.classList.remove("hidden");
 }
 
@@ -658,27 +917,292 @@ function fetchTopicalVerse(topic) {
 let timer = null;
 let seconds = 300;
 
+function updateTimerDisplay() {
+    const display = document.getElementById("timer-display");
+    if (!display) return;
+    const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const s = String(seconds % 60).padStart(2, "0");
+    display.textContent = `${m}:${s}`;
+}
+
 function toggleSolitudeTimer() {
+    const btn = document.getElementById("timer-btn");
+    const icon = document.getElementById("timer-icon");
+    if (!btn || !icon) return;
+
     if (timer) {
         clearInterval(timer);
         timer = null;
+        btn.textContent = "Resume Stillness";
+        icon.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
         return;
     }
 
+    btn.textContent = "In Session...";
+    icon.innerHTML = '<i class="fa-solid fa-spa"></i>';
+
     timer = setInterval(() => {
         seconds--;
-        document.getElementById("timer-display").textContent =
-            new Date(seconds * 1000).toISOString().substr(14,5);
+        if (seconds <= 0) {
+            clearInterval(timer);
+            timer = null;
+            seconds = 300;
+            btn.textContent = "Restart Stillness";
+            icon.innerHTML = '<i class="fa-solid fa-hourglass-start"></i>';
+        }
+        updateTimerDisplay();
+    }, 1000);
+}
 
-        if (seconds <= 0) clearInterval(timer);
-    },1000);
+/* ================= DAILY ROTATION DATA (THEMED) ================= */
+/* Themes:
+   1–20: Identity in Christ
+   21–40: Peace & Comfort
+   41–60: Faith & Trust
+   61–80: Hope & God's Promises
+   You can keep extending these arrays toward 365 days.
+*/
+
+const DAILY_VERSES = [
+    // Identity in Christ (1–20)
+    { ref: "John 1:12", query: "john 1:12" },
+    { ref: "2 Corinthians 5:17", query: "2 corinthians 5:17" },
+    { ref: "Galatians 2:20", query: "galatians 2:20" },
+    { ref: "Ephesians 1:3-4", query: "ephesians 1:3-4" },
+    { ref: "Ephesians 2:10", query: "ephesians 2:10" },
+    { ref: "Romans 8:1", query: "romans 8:1" },
+    { ref: "Romans 8:15-16", query: "romans 8:15-16" },
+    { ref: "Colossians 3:3", query: "colossians 3:3" },
+    { ref: "1 Peter 2:9", query: "1 peter 2:9" },
+    { ref: "1 John 3:1", query: "1 john 3:1" },
+    { ref: "Romans 8:37", query: "romans 8:37" },
+    { ref: "Philippians 3:20", query: "philippians 3:20" },
+    { ref: "Colossians 2:9-10", query: "colossians 2:9-10" },
+    { ref: "Ephesians 1:7", query: "ephesians 1:7" },
+    { ref: "Ephesians 3:17-19", query: "ephesians 3:17-19" },
+    { ref: "Romans 5:8", query: "romans 5:8" },
+    { ref: "John 15:15", query: "john 15:15" },
+    { ref: "1 Corinthians 6:19-20", query: "1 corinthians 6:19-20" },
+    { ref: "Colossians 1:13-14", query: "colossians 1:13-14" },
+    { ref: "Hebrews 4:16", query: "hebrews 4:16" },
+
+    // Peace & Comfort (21–40)
+    { ref: "Philippians 4:6-7", query: "philippians 4:6-7" },
+    { ref: "Isaiah 41:10", query: "isaiah 41:10" },
+    { ref: "Psalm 23:1-3", query: "psalm 23:1-3" },
+    { ref: "Psalm 27:1", query: "psalm 27:1" },
+    { ref: "John 14:27", query: "john 14:27" },
+    { ref: "Matthew 11:28-30", query: "matthew 11:28-30" },
+    { ref: "Psalm 46:1-2", query: "psalm 46:1-2" },
+    { ref: "Psalm 34:17-18", query: "psalm 34:17-18" },
+    { ref: "2 Corinthians 1:3-4", query: "2 corinthians 1:3-4" },
+    { ref: "Psalm 91:1-2", query: "psalm 91:1-2" },
+    { ref: "Isaiah 26:3", query: "isaiah 26:3" },
+    { ref: "Psalm 121:1-2", query: "psalm 121:1-2" },
+    { ref: "1 Peter 5:7", query: "1 peter 5:7" },
+    { ref: "Nahum 1:7", query: "nahum 1:7" },
+    { ref: "Psalm 55:22", query: "psalm 55:22" },
+    { ref: "Deuteronomy 31:8", query: "deuteronomy 31:8" },
+    { ref: "Zephaniah 3:17", query: "zephaniah 3:17" },
+    { ref: "Psalm 16:8-9", query: "psalm 16:8-9" },
+    { ref: "Isaiah 43:2", query: "isaiah 43:2" },
+    { ref: "Lamentations 3:22-23", query: "lamentations 3:22-23" },
+
+    // Faith & Trust (41–60)
+    { ref: "Hebrews 11:1", query: "hebrews 11:1" },
+    { ref: "Proverbs 3:5-6", query: "proverbs 3:5-6" },
+    { ref: "2 Corinthians 5:7", query: "2 corinthians 5:7" },
+    { ref: "Mark 9:23", query: "mark 9:23" },
+    { ref: "Romans 10:17", query: "romans 10:17" },
+    { ref: "James 1:2-4", query: "james 1:2-4" },
+    { ref: "1 Peter 1:6-7", query: "1 peter 1:6-7" },
+    { ref: "Psalm 37:3-5", query: "psalm 37:3-5" },
+    { ref: "Isaiah 40:31", query: "isaiah 40:31" },
+    { ref: "Habakkuk 3:17-19", query: "habakkuk 3:17-19" },
+    { ref: "Matthew 17:20", query: "matthew 17:20" },
+    { ref: "1 Corinthians 16:13", query: "1 corinthians 16:13" },
+    { ref: "Romans 4:20-21", query: "romans 4:20-21" },
+    { ref: "Psalm 112:7", query: "psalm 112:7" },
+    { ref: "Psalm 56:3-4", query: "psalm 56:3-4" },
+    { ref: "Jeremiah 17:7-8", query: "jeremiah 17:7-8" },
+    { ref: "John 20:29", query: "john 20:29" },
+    { ref: "Galatians 3:11", query: "galatians 3:11" },
+    { ref: "Hebrews 12:1-2", query: "hebrews 12:1-2" },
+    { ref: "Romans 15:13", query: "romans 15:13" },
+
+    // Hope & God's Promises (61–80)
+    { ref: "Jeremiah 29:11", query: "jeremiah 29:11" },
+    { ref: "Romans 15:4", query: "romans 15:4" },
+    { ref: "Psalm 130:5-6", query: "psalm 130:5-6" },
+    { ref: "Romans 5:3-5", query: "romans 5:3-5" },
+    { ref: "Hebrews 6:19", query: "hebrews 6:19" },
+    { ref: "1 Peter 1:3-5", query: "1 peter 1:3-5" },
+    { ref: "Psalm 33:18-22", query: "psalm 33:18-22" },
+    { ref: "Isaiah 40:28-31", query: "isaiah 40:28-31" },
+    { ref: "Lamentations 3:24-26", query: "lamentations 3:24-26" },
+    { ref: "Micah 7:7", query: "micah 7:7" },
+    { ref: "Psalm 27:13-14", query: "psalm 27:13-14" },
+    { ref: "Romans 8:24-25", query: "romans 8:24-25" },
+    { ref: "Titus 2:11-13", query: "titus 2:11-13" },
+    { ref: "Colossians 1:26-27", query: "colossians 1:26-27" },
+    { ref: "Hebrews 10:23", query: "hebrews 10:23" },
+    { ref: "Psalm 42:5", query: "psalm 42:5" },
+    { ref: "Zechariah 9:12", query: "zechariah 9:12" },
+    { ref: "Isaiah 49:15-16", query: "isaiah 49:15-16" },
+    { ref: "Revelation 21:3-4", query: "revelation 21:3-4" },
+    { ref: "Revelation 22:1-5", query: "revelation 22:1-5" }
+];
+
+const DAILY_FOCUS_CHAPTERS = [
+    // Identity in Christ (1–20)
+    { book: "Ephesians", chapter: 1 },
+    { book: "Ephesians", chapter: 2 },
+    { book: "Ephesians", chapter: 3 },
+    { book: "Romans", chapter: 8 },
+    { book: "Colossians", chapter: 1 },
+    { book: "Colossians", chapter: 2 },
+    { book: "Colossians", chapter: 3 },
+    { book: "John", chapter: 15 },
+    { book: "Galatians", chapter: 2 },
+    { book: "1 Peter", chapter: 2 },
+    { book: "Romans", chapter: 5 },
+    { book: "Romans", chapter: 6 },
+    { book: "Hebrews", chapter: 4 },
+    { book: "1 John", chapter: 3 },
+    { book: "1 Corinthians", chapter: 6 },
+    { book: "2 Corinthians", chapter: 5 },
+    { book: "Philippians", chapter: 3 },
+    { book: "John", chapter: 1 },
+    { book: "John", chapter: 3 },
+    { book: "Romans", chapter: 12 },
+
+    // Peace & Comfort (21–40)
+    { book: "Psalm", chapter: 23 },
+    { book: "Psalm", chapter: 27 },
+    { book: "Psalm", chapter: 46 },
+    { book: "Psalm", chapter: 91 },
+    { book: "Isaiah", chapter: 40 },
+    { book: "Isaiah", chapter: 41 },
+    { book: "Isaiah", chapter: 43 },
+    { book: "Philippians", chapter: 4 },
+    { book: "Matthew", chapter: 11 },
+    { book: "Matthew", chapter: 6 },
+    { book: "2 Corinthians", chapter: 1 },
+    { book: "Psalm", chapter: 34 },
+    { book: "Psalm", chapter: 121 },
+    { book: "Lamentations", chapter: 3 },
+    { book: "Zephaniah", chapter: 3 },
+    { book: "Deuteronomy", chapter: 31 },
+    { book: "Joshua", chapter: 1 },
+    { book: "Psalm", chapter: 16 },
+    { book: "Psalm", chapter: 62 },
+    { book: "John", chapter: 14 },
+
+    // Faith & Trust (41–60)
+    { book: "Hebrews", chapter: 11 },
+    { book: "James", chapter: 1 },
+    { book: "James", chapter: 2 },
+    { book: "Romans", chapter: 4 },
+    { book: "Romans", chapter: 10 },
+    { book: "Mark", chapter: 9 },
+    { book: "Matthew", chapter: 17 },
+    { book: "Habakkuk", chapter: 3 },
+    { book: "Psalm", chapter: 37 },
+    { book: "Psalm", chapter: 56 },
+    { book: "Psalm", chapter: 112 },
+    { book: "Jeremiah", chapter: 17 },
+    { book: "Hebrews", chapter: 12 },
+    { book: "1 Peter", chapter: 1 },
+    { book: "1 Peter", chapter: 5 },
+    { book: "Galatians", chapter: 3 },
+    { book: "1 Corinthians", chapter: 16 },
+    { book: "2 Corinthians", chapter: 4 },
+    { book: "2 Corinthians", chapter: 12 },
+    { book: "Romans", chapter: 15 },
+
+    // Hope & God's Promises (61–80)
+    { book: "Jeremiah", chapter: 29 },
+    { book: "Romans", chapter: 15 },
+    { book: "Psalm", chapter: 130 },
+    { book: "Hebrews", chapter: 6 },
+    { book: "1 Peter", chapter: 1 },
+    { book: "Isaiah", chapter: 40 },
+    { book: "Lamentations", chapter: 3 },
+    { book: "Psalm", chapter: 33 },
+    { book: "Psalm", chapter: 42 },
+    { book: "Psalm", chapter: 62 },
+    { book: "Micah", chapter: 7 },
+    { book: "Zechariah", chapter: 9 },
+    { book: "Titus", chapter: 2 },
+    { book: "Colossians", chapter: 1 },
+    { book: "Hebrews", chapter: 10 },
+    { book: "Romans", chapter: 5 },
+    { book: "1 Thessalonians", chapter: 4 },
+    { book: "Revelation", chapter: 21 },
+    { book: "Revelation", chapter: 22 },
+    { book: "1 Corinthians", chapter: 15 }
+];
+
+// Day-of-year helper (0–364) [web:47][web:51][web:60]
+function getDayOfYearIndex() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const day = Math.floor(diff / oneDay);
+    return day - 1;
+}
+
+/* ================= DAILY VERSE ================= */
+
+async function loadDailyVerse() {
+    const verseEl = document.getElementById("dashboard-verse");
+    const refEl = document.getElementById("dashboard-reference");
+    if (!verseEl || !refEl || !DAILY_VERSES.length) return;
+
+    const dayIndex = getDayOfYearIndex();
+    const idx = dayIndex % DAILY_VERSES.length;
+    const todayVerse = DAILY_VERSES[idx];
+
+    refEl.textContent = todayVerse.ref;
+
+    try {
+        const res = await fetch(`https://bible-api.com/${encodeURIComponent(todayVerse.query)}`);
+        const data = await res.json(); // bible-api.com [web:11]
+        if (data && data.text) {
+            verseEl.textContent = data.text;
+        } else {
+            verseEl.textContent = `Meditate on ${todayVerse.ref} today.`;
+        }
+    } catch (e) {
+        verseEl.textContent = `Meditate on ${todayVerse.ref} today.`;
+    }
+}
+
+/* ================= DAILY FOCUS CHAPTER ================= */
+
+function loadDailyFocusChapter() {
+    const el = document.getElementById("dashboard-reading-chapter");
+    if (!el || !DAILY_FOCUS_CHAPTERS.length) return;
+
+    const dayIndex = getDayOfYearIndex();
+    const idx = dayIndex % DAILY_FOCUS_CHAPTERS.length;
+
+    const todayChapter = DAILY_FOCUS_CHAPTERS[idx];
+    el.textContent = `${todayChapter.book} ${todayChapter.chapter}`;
 }
 
 /* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+    initGreeting();
+    initBibleBrowser();
     renderHabits();
     renderPrayers();
+    renderHeatmap();
+    updateTimerDisplay();
+    loadDailyVerse();
+    loadDailyFocusChapter();
 });
 </script>
 </body>
