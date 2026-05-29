@@ -159,11 +159,11 @@
             </div>
 
             <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 border border-rosewood-100/60 relative overflow-hidden">
-                <span class="text-xs font-bold uppercase tracking-widest text-rosewood-600 bg-rosewood-50 px-3 py-1 rounded-full">Anchor Verse of the Day</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-rosewood-600 bg-rosewood-50 px-3 py-1 rounded-full">Scripture of the Day</span>
                 <blockquote id="dashboard-verse" class="mt-4 text-lg md:text-xl font-light text-gray-800 italic leading-relaxed">
-                    "The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you..."
+                    Loading today's fresh bread...
                 </blockquote>
-                <cite id="dashboard-reference" class="block mt-4 text-sm font-semibold text-rosewood-500 not-italic">— Numbers 6:24-26</cite>
+                <cite id="dashboard-reference" class="block mt-4 text-sm font-semibold text-rosewood-500 not-italic">Please wait</cite>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -349,6 +349,7 @@
     </div>
 
     <script>
+        // Pre-loaded spiritual reflections fallback database
         const devotionalContent = {
             verse: "Abide in me, and I in you. As the branch cannot bear fruit of itself, except it abide in the vine; no more can ye, except ye abide in me.",
             ref: "John 15:4",
@@ -363,7 +364,7 @@
 
         const todayString = new Date().toISOString().split('T')[0];
 
-        // Core Consolidated App Engine State (Syncs Devotional Framework + Custom Habits Data Matrix)
+        // Core Consolidated App Engine State 
         let appData = JSON.parse(localStorage.getItem('sanctuary_master_store')) || {
             habits: [
                 { id: 'h1', name: 'Drink 3L Water 💧', type: 'quantifiable', target: 3000, unit: 'ml', history: {}, currentStreak: 0 },
@@ -419,20 +420,41 @@
             document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
 
-        function loadDevotionalView() {
+        // ================= LIVE BIBLE ENGINE INJECTION LAYER =================
+        async function loadDevotionalView() {
+            try {
+                // Fetch daily quote packet cleanly over secure network pipeline
+                const response = await fetch('https://beta.ourmanna.com/api/v1/get?format=json&order=daily');
+                if (!response.ok) throw new Error("API Pipeline offline");
+                
+                const data = await response.json();
+                const apiVerse = data.verse.details.text;
+                const apiReference = `${data.verse.details.reference} (${data.verse.details.version})`;
+                
+                // Mount live properties safely onto layout elements
+                document.getElementById('dashboard-verse').innerText = `"${apiVerse}"`;
+                document.getElementById('dashboard-reference').innerText = `— ${apiReference}`;
+                
+                const chapterOnly = data.verse.details.reference.split(':')[0];
+                document.getElementById('dashboard-reading-chapter').innerText = chapterOnly;
+                
+                document.getElementById('reading-plan-container').innerHTML = `
+                    <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 hover:bg-sage-50/50 cursor-pointer transition-all">
+                        <span class="text-sm font-semibold text-gray-700">${chapterOnly} — Deep Study Chapter</span>
+                        <input type="checkbox" onchange="appData.readingComplete = this.checked; saveState(); renderHeatmapMatrix();" ${appData.readingComplete ? 'checked' : ''} class="w-5 h-5 text-rosewood-500 focus:ring-rosewood-400 accent-rosewood-500">
+                    </label>
+                `;
+            } catch (error) {
+                console.log("Network error, running fallback:", error);
+                useFallbackDevotional();
+            }
+            renderDevotionalParagraphs();
+        }
+
+        function useFallbackDevotional() {
             document.getElementById('dashboard-verse').innerText = `"${devotionalContent.verse}"`;
             document.getElementById('dashboard-reference').innerText = `— ${devotionalContent.ref}`;
             document.getElementById('dashboard-reading-chapter').innerText = devotionalContent.reading;
-            document.getElementById('devotion-title').innerHTML = `<i class="fa-solid fa-feather-pointed text-rosewood-500"></i> ${devotionalContent.title}`;
-            
-            const b = document.getElementById('devotion-body');
-            b.innerHTML = '';
-            devotionalContent.body.forEach(p => {
-                const el = document.createElement('p');
-                el.innerText = p;
-                b.appendChild(el);
-            });
-
             document.getElementById('reading-plan-container').innerHTML = `
                 <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 hover:bg-sage-50/50 cursor-pointer transition-all">
                     <span class="text-sm font-semibold text-gray-700">${devotionalContent.reading} — Deep Study Chapter</span>
@@ -441,7 +463,18 @@
             `;
         }
 
-        // ================= UPGRADED HABIT ADVANCED RENDERING ENGINE =================
+        function renderDevotionalParagraphs() {
+            document.getElementById('devotion-title').innerHTML = `<i class="fa-solid fa-feather-pointed text-rosewood-500"></i> ${devotionalContent.title}`;
+            const b = document.getElementById('devotion-body');
+            b.innerHTML = '';
+            devotionalContent.body.forEach(p => {
+                const el = document.createElement('p');
+                el.innerText = p;
+                b.appendChild(el);
+            });
+        }
+
+        // ================= HABIT WORKSPACE RENDERING MODULE =================
         function renderAdvancedHabits() {
             const grid = document.getElementById('habitWorkspaceGrid');
             grid.innerHTML = '';
@@ -498,7 +531,6 @@
             const h = appData.habits.find(x => x.id === id);
             if(h) {
                 const current = h.history[todayString] || 0;
-                // Steps logic: changes value dynamically based on step scales
                 const step = h.target > 100 ? 250 : 1;
                 h.history[todayString] = Math.max(0, current + (action * step));
                 recalcStreak(h);
@@ -567,7 +599,7 @@
             });
         }
 
-        // ================= MODAL INTERACTIVE WINDOW LOGIC =================
+        // ================= MODAL WINDOW CONTROLS =================
         function openHabitModal() {
             const m = document.getElementById('habitModal');
             m.classList.remove('opacity-0', 'pointer-events-none');
@@ -609,7 +641,7 @@
             renderHeatmapMatrix();
         }
 
-        // ================= DATA PIPELINE BACKUP ENGINE (JSON EXPORT/IMPORT) =================
+        // ================= DATA PIPELINE ENGINE (JSON EXPORT/IMPORT) =================
         window.exportDataEngine = function() {
             const str = JSON.stringify(appData);
             const blob = new Blob([str], { type: 'application/json' });
@@ -630,7 +662,7 @@
             reader.onload = function(evt) {
                 try {
                     const parsed = JSON.parse(evt.target.result);
-                    if(!parsed.habits || !parsed.prayers || !parsed.soap) throw new Error("Invalid structure data layout.");
+                    if(!parsed.habits || !parsed.prayers || !parsed.soap) throw new Error("Invalid format.");
                     if(confirm("Restore this backup? This merges and replaces active digital journal records.")) {
                         appData = parsed;
                         saveState();
