@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Catalyst — Advanced Track Engine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <div>
+        <h1>Habit Catalyst</h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">Advanced Data Engine v1.1</p>
+      </div>
+      <div style="display: flex; gap: 0.8rem; align-items: center;">
+        <button onclick="exportData()" class="btn-secondary" title="Download backup file">💾 Export Data</button>
+        <label class="btn-secondary" style="cursor: pointer; display: inline-block;" title="Upload a backup file">
+          📂 Import Data
+          <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
+        </label>
+        <button id="openModalBtn" class="btn-primary">+ Add New Habit</button>
+      </div>
+    </header>
+
+    <section class="analytics-panel">
+      <div class="analytics-header">
+        <h3>Yearly Consistency Map</h3>
+        <div class="heatmap-legend">
+          <span>Less</span>
+          <div class="legend-square level-0"></div>
+          <div class="legend-square level-1"></div>
+          <div class="legend-square level-2"></div>
+          <div class="legend-square level-3"></div>
+          <span>More</span>
+        </div>
+      </div>
+      <div class="heatmap-wrapper">
+        <div id="heatmapGrid" class="heatmap-grid"></div>
+      </div>
+    </section>
+
+    <main id="habitsContainer" class="habits-grid">
+      </main>
+  </div>
+
+  <div id="habitModal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Create a New Habit</h2>
+      <form id="habitForm">
+        <div class="form-group">
+          <label for="habitName">Habit Name</label>
+          <input type="text" id="habitName" required placeholder="e.g., Drink Water, Study Code...">
+        </div>
+
+        <div class="form-group">
+          <label for="habitType">Tracking Style</label>
+          <select id="habitType">
+            <option value="binary">Simple Checkbox (Yes / No)</option>
+            <option value="quantifiable">Quantifiable (Set a Target)</option>
+          </select>
+        </div>
+
+        <div id="quantifiableFields" class="form-group-row" style="display: none;">
+          <div class="form-group">
+            <label for="habitTarget">Daily Target</label>
+            <input type="number" id="habitTarget" min="1" value="1">
+          </div>
+          <div class="form-group">
+            <label for="habitUnit">Unit</label>
+            <input type="text" id="habitUnit" placeholder="e.g., pages, ml, mins">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="closeModalBtn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Save Habit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
