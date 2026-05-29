@@ -413,434 +413,273 @@
         </div>
     </div>
 
-    <script>
-        // ================= PERPETUAL 365-DAY SCRIPTURE & STUDY MATRIX =================
-        const perpetualDevotionalMatrix = {
-            1: { verse: "In the beginning God created the heaven and the earth.", ref: "Genesis 1:1", reading: "Genesis 1", title: "The God of Beginnings", paragraphs: ["Every beautiful story, every season of growth, and every clean slate begins in the hands of God.", "Rosemary, whatever you are starting today, know that the Creator is shaping your foundation with infinite care."] },
-            145: { verse: "Abide in me, and I in you. As the branch cannot bear fruit of itself, except it abide in the vine; no more can ye, except ye abide in me.", ref: "John 15:4", reading: "John 15", title: "Abiding in the True Vine", paragraphs: ["True transformation does not happen through frantic striving; it flows from staying close to the Source.", "Nkeiruka, rest in the reassurance that you are simply the branch. Let His grace carry your weight today."] },
-            149: { verse: "Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you.", ref: "John 14:27", reading: "John 14", title: "A Peace the World Cannot Fake", paragraphs: ["The world offers temporary quiet, but Christ implants a structural, unshakeable peace deep within the soul.", "When things feel complex around you, take a slow breath. His peace is actively guarding your path."] },
-            365: { verse: "The Lord bless thee, and keep thee: The Lord make his face shine upon thee...", ref: "Numbers 6:24-25", reading: "Numbers 6", title: "The Full Circle Blessing", paragraphs: ["You are perfectly preserved, sustained, and fiercely loved through every milestone of this year.", "Look back at the legacy map of your journey and step forward into tomorrow with your head held high."]
-        };
+  <script>
+/* ================= CORE STATE ENGINE ================= */
 
-        const bibleBooksMetadata = [
-            { name: "Genesis", chapters: 50, id: "GEN" }, { name: "Exodus", chapters: 40, id: "EXO" }, { name: "Leviticus", chapters: 27, id: "LEV" }, { name: "Numbers", chapters: 36, id: "NUM" }, { name: "Deuteronomy", chapters: 34, id: "DEU" },
-            { name: "Joshua", chapters: 24, id: "JOS" }, { name: "Judges", chapters: 21, id: "JDG" }, { name: "Ruth", chapters: 4, id: "RUT" }, { name: "1 Samuel", chapters: 31, id: "1SA" }, { name: "2 Samuel", chapters: 24, id: "2SA" },
-            { name: "1 Kings", chapters: 22, id: "1KI" }, { name: "2 Kings", chapters: 25, id: "2KI" }, { name: "1 Chronicles", chapters: 29, id: "1CH" }, { name: "2 Chronicles", chapters: 36, id: "2CH" }, { name: "Ezra", chapters: 10, id: "EZR" },
-            { name: "Nehemiah", chapters: 13, id: "NEH" }, { name: "Esther", chapters: 10, id: "EST" }, { name: "Job", chapters: 42, id: "JOB" }, { name: "Psalms", chapters: 150, id: "PSA" }, { name: "Proverbs", chapters: 31, id: "PRO" },
-            { name: "Ecclesiastes", chapters: 12, id: "ECC" }, { name: "Song of Solomon", chapters: 8, id: "SNG" }, { name: "Isaiah", chapters: 66, id: "ISA" }, { name: "Jeremiah", chapters: 52, id: "JER" }, { name: "Lamentations", chapters: 5, id: "LAM" },
-            { name: "Ezekiel", chapters: 48, id: "EZK" }, { name: "Daniel", chapters: 12, id: "DAN" }, { name: "Hosea", chapters: 14, id: "HOS" }, { name: "Joel", chapters: 3, id: "JOL" }, { name: "Amos", chapters: 9, id: "AMO" },
-            { name: "Obadiah", chapters: 1, id: "OBA" }, { name: "Jonah", chapters: 4, id: "JON" }, { name: "Micah", chapters: 7, id: "MIC" }, { name: "Nahum", chapters: 3, id: "NAM" }, { name: "Habakkuk", chapters: 3, id: "HAB" },
-            { name: "Zephaniah", chapters: 3, id: "ZEP" }, { name: "Haggai", chapters: 2, id: "HAG" }, { name: "Zechariah", chapters: 14, id: "ZEC" }, { name: "Malachi", chapters: 4, id: "MAL" },
-            { name: "Matthew", chapters: 28, id: "MAT" }, { name: "Mark", chapters: 16, id: "MRK" }, { name: "Luke", chapters: 24, id: "LUK" }, { name: "John", chapters: 21, id: "JHN" }, { name: "Acts", chapters: 28, id: "ACT" },
-            { name: "Romans", chapters: 16, id: "ROM" }, { name: "1 Corinthians", chapters: 16, id: "1CO" }, { name: "2 Corinthians", chapters: 13, id: "2CO" }, { name: "Galatians", chapters: 6, id: "GAL" }, { name: "Ephesians", chapters: 6, id: "EPH" },
-            { name: "Philippians", chapters: 4, id: "PHP" }, { name: "Colossians", chapters: 4, id: "COL" }, { name: "1 Thessalonians", chapters: 5, id: "1TH" }, { name: "2 Thessalonians", chapters: 3, id: "2TH" }, { name: "1 Timothy", chapters: 6, id: "1TM" },
-            { name: "2 Timothy", chapters: 4, id: "2TM" }, { name: "Titus", chapters: 3, id: "TIT" }, { name: "Philemon", chapters: 1, id: "PHM" }, { name: "Hebrews", chapters: 13, id: "HEB" }, { name: "James", chapters: 5, id: "JAS" },
-            { name: "1 Peter", chapters: 5, id: "1PT" }, { name: "2 Peter", chapters: 3, id: "2PT" }, { name: "1 John", chapters: 5, id: "1JN" }, { name: "2 John", chapters: 1, id: "2JN" }, { name: "3 John", chapters: 1, id: "3JN" },
-            { name: "Jude", chapters: 1, id: "JUD" }, { name: "Revelation", chapters: 22, id: "REV" }
-        ];
+const STORAGE_KEY = "sanctuary_app_data_v1";
 
-        const todayString = new Date().toISOString().split('T')[0];
+let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+    habits: [],
+    prayers: [],
+    answeredPrayers: [],
+    soapEntries: [],
+    heatmap: {}
+};
 
-        // Safe Fallback State Loader Engine (v4 Instance Separation)
-        let appData = { habits: [], prayers: [], soap: {s:'',o:'',a:'',p:''}, readingComplete: false };
-        try {
-            const raw = localStorage.getItem('sanctuary_master_deep_store_v4');
-            if (raw) {
-                appData = JSON.parse(raw);
-            } else {
-                throw new Error("Initialize Clean Cache Setup");
-            }
-        } catch(e) {
-            appData = {
-                habits: [
-                    { id: 'h1', name: 'Drink 3L Water 💧', type: 'quantifiable', target: 3000, unit: 'ml', history: {}, currentStreak: 0 },
-                    { id: 'h2', name: 'Morning Gratitude ☀️', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 },
-                    { id: 'h3', name: 'Scripture Meditation 📖', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 }
-                ],
-                prayers: [
-                    { id: 1, text: "Praying for perfect clarity, guidance, and peace over my upcoming personal goals.", status: 'active', testimony: '' },
-                    { id: 2, text: "Praise God for His continuous grace, protection, and unconditional love over my life.", status: 'answered', testimony: 'He has sustained me through every transition beautifully!', dateAnswered: '2026-05-28' }
-                ],
-                soap: { s: '', o: '', a: '', p: '' },
-                readingComplete: false
-            };
-            localStorage.setItem('sanctuary_master_deep_store_v4', JSON.stringify(appData));
-        }
+function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
 
-        function saveState() {
-            localStorage.setItem('sanctuary_master_deep_store_v4', JSON.stringify(appData));
-        }
+/* ================= NAVIGATION ================= */
 
-        // Fixed Page Router Switching System Engine (Uses display utilities directly via Tailwind layout toggling hooks)
-        function switchPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => {
-                p.classList.add('hidden');
-                p.classList.remove('block', 'space-y-8', 'space-y-6');
-            });
-            
-            const activePage = document.getElementById(pageId);
-            if (activePage) {
-                activePage.classList.remove('hidden');
-                if (pageId === 'bibleBrowser') {
-                    activePage.classList.add('block', 'space-y-6');
-                } else {
-                    activePage.classList.add('block', 'space-y-8');
-                }
-            }
+function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById(pageId).classList.remove('hidden');
+}
 
-            // Sync Web Sidebar Buttons UI Display States
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.getAttribute('data-page') === pageId) {
-                    btn.classList.add('bg-rosewood-50', 'text-rosewood-500');
-                    btn.classList.remove('text-gray-500', 'hover:bg-sage-50');
-                } else {
-                    btn.classList.remove('bg-rosewood-50', 'text-rosewood-500');
-                    btn.classList.add('text-gray-500', 'hover:bg-sage-50');
-                }
-            });
+/* ================= GREETING ================= */
 
-            // Sync Mobile Nav Bottom Links Display Layout Framework States
-            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
-                if(btn.getAttribute('data-page') === pageId) {
-                    btn.classList.add('text-rosewood-500');
-                    btn.classList.remove('text-gray-400');
-                } else {
-                    btn.classList.remove('text-rosewood-500');
-                    btn.classList.add('text-gray-400');
-                }
-            });
+(function initGreeting() {
+    const el = document.getElementById("dynamic-greeting");
+    const dateEl = document.getElementById("current-date");
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    const h = new Date().getHours();
+    let g = "Good Evening";
+    if (h < 12) g = "Good Morning";
+    else if (h < 18) g = "Good Afternoon";
 
-        window.addEventListener('DOMContentLoaded', () => {
-            initGreetingAndDates();
-            loadPerpetualDevotionalEngine();
-            buildBibleBrowserDropdowns();
-            renderAdvancedHabits();
-            renderPrayerWall();
-            loadSoapNotes();
-            renderHeatmapMatrix();
-        });
+    if (el) el.textContent = `${g}, Nkeiruka ✨`;
+    if (dateEl) dateEl.textContent = new Date().toDateString();
+})();
 
-        function initGreetingAndDates() {
-            const now = new Date(); const hour = now.getHours();
-            let greet = "Good Morning, Nkeiruka ✨";
-            if(hour >= 12 && hour < 17) greet = "Blessed Afternoon, Rosemary ☀️";
-            else if(hour >= 17 || hour < 4) greet = "Rest Well Tonight, Nkeiruka 🌙";
-            document.getElementById('dynamic-greeting').innerText = greet;
-            document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
+/* ================= SOUL ALIGN ================= */
 
-        function getDayOfYearIndex() {
-            const now = new Date();
-            const start = new Date(now.getFullYear(), 0, 0);
-            const diff = now - start;
-            const oneDay = 1000 * 60 * 60 * 24;
-            return Math.floor(diff / oneDay);
-        }
+function alignSoul(state) {
+    const el = document.getElementById("soul-alignment-card");
 
-        function loadPerpetualDevotionalEngine() {
-            const dayIndex = getDayOfYearIndex();
-            const content = perpetualDevotionalMatrix[dayIndex] || perpetualDevotionalMatrix[145];
+    const map = {
+        weary: "Matthew 11:28 — Come to me, all who are weary.",
+        anxious: "1 Peter 5:7 — Cast all your anxiety on Him.",
+        peaceful: "Philippians 4:7 — His peace guards you.",
+        joyful: "Nehemiah 8:10 — The joy of the Lord is your strength.",
+        seeking: "Jeremiah 33:3 — Call unto Me and I will answer."
+    };
 
-            document.getElementById('dashboard-verse').innerText = `"${content.verse}"`;
-            document.getElementById('dashboard-reference').innerText = `— ${content.ref}`;
-            document.getElementById('dashboard-reading-chapter').innerText = content.reading;
+    el.textContent = map[state];
+    el.classList.remove("hidden");
+}
 
-            document.getElementById('devotion-title').innerHTML = `<i class="fa-solid fa-feather-pointed text-rosewood-500"></i> ${content.title}`;
-            const bodyDiv = document.getElementById('devotion-body');
-            if(bodyDiv) {
-                bodyDiv.innerHTML = '';
-                content.paragraphs.forEach(pText => {
-                    const p = document.createElement('p');
-                    p.innerText = pText;
-                    bodyDiv.appendChild(p);
-                });
-            }
+/* ================= EXPORT / IMPORT ================= */
 
-            const planContainer = document.getElementById('reading-plan-container');
-            if(planContainer) {
-                planContainer.innerHTML = `
-                    <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 hover:bg-sage-50/50 cursor-pointer transition-all">
-                        <span class="text-sm font-semibold text-gray-700">${content.reading} — Deep Study Chapter</span>
-                        <input type="checkbox" onchange="appData.readingComplete = this.checked; saveState(); renderHeatmapMatrix();" ${appData.readingComplete ? 'checked' : ''} class="w-5 h-5 text-rosewood-500 accent-rosewood-500">
-                    </label>
-                `;
-            }
-        }
+function exportDataEngine() {
+    const blob = new Blob([JSON.stringify(appData, null, 2)], {type:'application/json'});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "sanctuary.json";
+    a.click();
+}
 
-        function buildBibleBrowserDropdowns() {
-            const bookSelect = document.getElementById('bible-book-select');
-            if(!bookSelect) return;
-            bookSelect.innerHTML = '';
-            bibleBooksMetadata.forEach((b, idx) => {
-                const opt = document.createElement('option');
-                opt.value = idx;
-                opt.innerText = b.name;
-                bookSelect.appendChild(opt);
-            });
-            updateChapterDropdown();
-        }
+function importDataEngine(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
 
-        function updateChapterDropdown() {
-            const bookIdx = document.getElementById('bible-book-select').value;
-            const b = bibleBooksMetadata[bookIdx];
-            const chapSelect = document.getElementById('bible-chapter-select');
-            if(!chapSelect) return;
-            chapSelect.innerHTML = '';
-            for(let i = 1; i <= b.chapters; i++) {
-                const opt = document.createElement('option');
-                opt.value = i; opt.innerText = i;
-                chapSelect.appendChild(opt);
-            }
-        }
+    reader.onload = () => {
+        appData = JSON.parse(reader.result);
+        saveData();
+        alert("Imported successfully");
+        location.reload();
+    };
 
-        async function fetchFullBibleChapter() {
-            const bookIdx = document.getElementById('bible-book-select').value;
-            const book = bibleBooksMetadata[bookIdx];
-            const chapter = document.getElementById('bible-chapter-select').value;
-            const loader = document.getElementById('bible-loading-indicator');
-            const viewTitle = document.getElementById('bible-view-title');
-            const viewBody = document.getElementById('bible-view-body');
+    reader.readAsText(file);
+}
 
-            if(loader) loader.classList.remove('hidden');
-            if(viewTitle) viewTitle.innerText = `${book.name} Chapter ${chapter}`;
+/* ================= PRAYER SYSTEM ================= */
 
-            try {
-                const res = await fetch(`https://bible-api.com/${book.name}+${chapter}`);
-                if(!res.ok) throw new Error("Stream offline");
-                const data = await res.json();
-                
-                if(viewBody) {
-                    viewBody.innerHTML = '';
-                    data.verses.forEach(v => {
-                        const p = document.createElement('p');
-                        p.className = "mb-3 tracking-normal text-gray-800 text-left";
-                        p.innerHTML = `<span class="text-rosewood-500 font-bold text-xs select-none mr-2">${v.verse}</span>${v.text}`;
-                        viewBody.appendChild(p);
-                    });
-                }
-            } catch (err) {
-                if(viewBody) {
-                    viewBody.innerHTML = `
-                        <div class="p-4 rounded-xl bg-orange-50 text-orange-800 text-sm font-medium border border-orange-100">
-                            ⚠️ <strong>Connection Shield Active:</strong> The scroll pipeline is currently experiencing network delays in your area. Open up your physical scripture pages or try again in a brief second. God's truth remains unshakeable!
-                        </div>
-                    `;
-                }
-            } finally {
-                if(loader) loader.classList.add('hidden');
-            }
-        }
+function addNewPrayerRequest() {
+    const input = document.getElementById("prayer-input");
+    if (!input.value.trim()) return;
 
-        function alignSoul(mood) {
-            const card = document.getElementById('soul-alignment-card');
-            if(!card) return;
-            card.classList.remove('hidden');
-            document.querySelectorAll('.soul-btn').forEach(b => b.classList.remove('bg-rosewood-50', 'text-rosewood-600', 'border-rosewood-300'));
-            const alignments = {
-                weary: "🍂 'Come to me, all you who are weary and burdened, and I will give you rest.' (Matthew 11:28). Rosemary, it is okay to just sit quietly with Him right now. You don't have to perform. Just lean.",
-                anxious: "⛈️ 'Do not be anxious about anything, but in every situation... present your requests to God.' (Philippians 4:6). Breathe deeply, Nkeiruka. Hand over that specific heavy loop to Him right now.",
-                peaceful: "🕊️ 'The peace of God, which transcends all understanding, will guard your heart.' (Philippians 4:7). Praise Him for this calm water today, sweet girl. Let it soak into your actions.",
-                joyful: "☀️ 'The joy of the Lord is your strength.' (Nehemiah 8:10). Let your heart overflow, Rosemary! Write down a quick praise note today to anchor this baseline of gratitude.",
-                seeking: "🔍 'Trust in the Lord with all your heart and lean not on your own understanding.' (Proverbs 3:5). He knows the full map ahead of you. Step out in absolute trust."
-            };
-            card.innerText = alignments[mood] || '';
-        }
+    appData.prayers.push({
+        id: Date.now(),
+        text: input.value,
+        date: new Date().toLocaleDateString()
+    });
 
-        function fetchTopicalVerse(topic) {
-            const out = document.getElementById('topical-output'); 
-            if(!out) return;
-            out.classList.remove('hidden');
-            const database = {
-                peace: "🕊️ John 14:27 — 'Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.'",
-                faith: "🛡️ Isaiah 41:10 — 'Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.'",
-                love: "❤️ Romans 8:38-39 — 'For I am persuaded, that neither death, nor life... shall be able to separate us from the love of God, which is in Christ Jesus our Lord.'"
-            };
-            out.innerText = database[topic];
-            const soapS = document.getElementById('soap-s');
-            if(soapS) soapS.value = database[topic];
-        }
+    input.value = "";
+    saveData();
+    renderPrayers();
+}
 
-        let timerInterval = null; let timerDuration = 300;
-        function toggleSolitudeTimer() {
-            const btn = document.getElementById('timer-btn'); const icon = document.getElementById('timer-icon');
-            if(timerInterval) {
-                clearInterval(timerInterval); timerInterval = null; btn.innerText = "Resume Stillness";
-                icon.innerHTML = `<i class="fa-solid fa-pause text-orange-400"></i>`;
-            } else {
-                btn.innerText = "Pause"; icon.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-                timerInterval = setInterval(() => {
-                    timerDuration--;
-                    const mins = String(Math.floor(timerDuration / 60)).padStart(2, '0');
-                    const secs = String(timerDuration % 60).padStart(2, '0');
-                    document.getElementById('timer-display').innerText = `${mins}:${secs}`;
-                    if(timerDuration <= 0) {
-                        clearInterval(timerInterval); timerInterval = null; document.getElementById('timer-display').innerText = "Be Still";
-                        btn.innerText = "Reset Timer"; icon.innerHTML = `<i class="fa-solid fa-bell text-emerald-400"></i>`;
-                        timerDuration = 300; alert("Be still, and know that I am God. ✨");
-                    }
-                }, 1000);
-            }
-        }
+function renderPrayers() {
+    const active = document.getElementById("active-prayers");
+    const answered = document.getElementById("answered-prayers");
 
-        function renderAdvancedHabits() {
-            const grid = document.getElementById('habitWorkspaceGrid'); if(!grid) return; grid.innerHTML = '';
-            if(!appData.habits || appData.habits.length === 0) return;
-            appData.habits.forEach(habit => {
-                const progress = habit.history[todayString] || 0; const isDone = progress >= habit.target;
-                const card = document.createElement('div');
-                card.className = `bg-white rounded-2xl p-5 border shadow-sm flex flex-col justify-between transition-all ${isDone ? 'border-emerald-200 bg-emerald-50/10' : 'border-sage-100'}`;
-                if(habit.type === 'binary') {
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <h4 class="font-bold text-gray-800 text-base leading-snug">${habit.name}</h4>
-                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full">🔥 ${habit.currentStreak || 0}d</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-gray-50/50 border border-gray-100 p-3 rounded-xl">
-                            <span class="text-xs font-medium text-gray-400">${isDone ? 'Completed Today' : 'Mark Complete'}</span>
-                            <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleBinaryHabit('${habit.id}', this.checked)" class="w-5 h-5 accent-rosewood-500 cursor-pointer">
-                        </div>`;
-                } else {
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <h4 class="font-bold text-gray-800 text-base leading-snug">${habit.name}</h4>
-                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full">🔥 ${habit.currentStreak || 0}d</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-gray-50/50 border border-gray-100 p-3 rounded-xl">
-                            <div class="text-sm font-bold text-gray-700">${progress} <span class="text-xs font-medium text-gray-400">/ ${habit.target} ${habit.unit}</span></div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="incrementQuantifiableHabit('${habit.id}', -1)" class="w-7 h-7 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-xs font-bold">-</button>
-                                <button onclick="incrementQuantifiableHabit('${habit.id}', 1)" class="w-7 h-7 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-xs font-bold">+</button>
-                            </div>
-                        </div>`;
-                }
-                grid.appendChild(card);
-            });
-        }
+    if (!active || !answered) return;
 
-        function toggleBinaryHabit(id, checked) {
-            const h = appData.habits.find(x => x.id === id);
-            if(h) { h.history[todayString] = checked ? 1 : 0; recalcStreak(h); saveState(); renderAdvancedHabits(); renderHeatmapMatrix(); }
-        }
+    active.innerHTML = "";
+    answered.innerHTML = "";
 
-        function incrementQuantifiableHabit(id, action) {
-            const h = appData.habits.find(x => x.id === id);
-            if(h) {
-                const current = h.history[todayString] || 0; const step = h.target > 100 ? 250 : 1;
-                h.history[todayString] = Math.max(0, current + (action * step));
-                recalcStreak(h); saveState(); renderAdvancedHabits(); renderHeatmapMatrix();
-            }
-        }
+    appData.prayers.forEach(p => {
+        active.innerHTML += `
+            <div class="bg-white p-3 rounded-xl border flex justify-between">
+                <span>${p.text}</span>
+                <button onclick="markAnswered(${p.id})">✔</button>
+            </div>
+        `;
+    });
 
-        function recalcStreak(habit) {
-            let streak = 0; let d = new Date();
-            while(true) {
-                const dStr = d.toISOString().split('T')[0];
-                if((habit.history[dStr] || 0) >= habit.target) { streak++; d.setDate(d.getDate() - 1); }
-                else { if(dStr === todayString) { d.setDate(d.getDate() - 1); continue; } break; }
-            }
-            habit.currentStreak = streak;
-        }
+    appData.answeredPrayers.forEach(p => {
+        answered.innerHTML += `
+            <div class="text-sm border-l-2 pl-2">${p.text}</div>
+        `;
+    });
+}
 
-        function renderHeatmapMatrix() {
-            const grid = document.getElementById('heatmapGrid'); if(!grid) return; grid.innerHTML = '';
-            const total = (appData.habits || []).length; const today = new Date(); const dates = [];
-            for (let i = 364; i >= 0; i--) { const cur = new Date(); cur.setDate(today.getDate() - i); dates.push(cur); }
-            dates.forEach(date => {
-                const dStr = date.toISOString().split('T')[0]; let doneCount = 0;
-                if(appData.habits) {
-                    appData.habits.forEach(h => { if((h.history[dStr] || 0) >= h.target) doneCount++; });
-                }
-                let level = 0;
-                if(total > 0 && doneCount > 0) {
-                    const ratio = doneCount / total;
-                    if(ratio <= 0.34) level = 1; else if(ratio <= 0.74) level = 2; else level = 3;
-                }
-                const sq = document.createElement('div'); sq.className = `heat-square level-${level}`;
-                sq.setAttribute('data-tooltip', `${date.toLocaleDateString('en-US', {month:'short', day:'numeric'})}: ${doneCount}/${total} Done`);
-                grid.appendChild(sq);
-            });
-        }
+function markAnswered(id) {
+    const index = appData.prayers.findIndex(p => p.id === id);
+    const item = appData.prayers.splice(index, 1)[0];
+    appData.answeredPrayers.push(item);
 
-        function renderPrayerWall() {
-            const act = document.getElementById('active-prayers'); const ans = document.getElementById('answered-prayers');
-            if(!act || !ans) return; act.innerHTML = ''; ans.innerHTML = '';
-            if(!appData.prayers) return;
-            appData.prayers.forEach(p => {
-                if(p.status === 'active') {
-                    const div = document.createElement('div'); div.className = "bg-white p-4 rounded-xl border border-sage-100 shadow-sm flex justify-between items-center gap-4 text-left";
-                    div.innerHTML = `
-                        <p class="text-sm text-gray-700 font-medium">"${p.text}"</p>
-                        <button onclick="triggerHallelujahPipeline(${p.id})" class="text-gray-300 hover:text-emerald-500 transition-colors shrink-0"><i class="fa-solid fa-circle-check text-xl"></i></button>
-                    `;
-                    act.appendChild(div);
-                } else {
-                    const block = document.createElement('div'); block.className = "relative pl-6 pb-2 space-y-1 text-left";
-                    block.innerHTML = `
-                        <div class="absolute left-0 top-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white shadow-sm ring-4 ring-emerald-5 z-10"></div>
-                        <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Answered</span>
-                        <p class="text-sm text-gray-800 font-semibold mt-1">"${p.text}"</p>
-                        ${p.testimony ? `<p class="text-xs text-gray-500 italic bg-gray-50 p-2.5 rounded-lg border border-gray-100 mt-1"><strong>Rosemary's Testimony:</strong> ${p.testimony}</p>` : ''}
-                    `;
-                    ans.appendChild(block);
-                }
-            });
-        }
+    saveData();
+    renderPrayers();
+}
 
-        function triggerHallelujahPipeline(id) {
-            document.getElementById('target-prayer-id').value = id; document.getElementById('testimony-note').value = '';
-            const m = document.getElementById('testimonyModal'); m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto');
-        }
-        function closeTestimonyModal() {
-            const m = document.getElementById('testimonyModal'); m.classList.add('opacity-0', 'pointer-events-none'); m.classList.remove('opacity-100', 'pointer-events-auto');
-            const id = Number(document.getElementById('target-prayer-id').value); executePrayerResolve(id, "");
-        }
-        function submitTestimony() {
-            const id = Number(document.getElementById('target-prayer-id').value); const text = document.getElementById('testimony-note').value.trim();
-            const m = document.getElementById('testimonyModal'); m.classList.add('opacity-0', 'pointer-events-none'); m.classList.remove('opacity-100', 'pointer-events-auto'); executePrayerResolve(id, text);
-        }
-        function executePrayerResolve(id, testimonyText) {
-            const p = appData.prayers.find(x => x.id === id);
-            if(p) { p.status = 'answered'; p.testimony = testimonyText; p.dateAnswered = todayString; saveState(); renderPrayerWall(); }
-        }
-        function addNewPrayerRequest() {
-            const el = document.getElementById('prayer-input'); const val = el.value.trim(); if(!val) return;
-            appData.prayers.push({ id: Date.now(), text: val, status: 'active', testimony: '' }); el.value = ''; saveState(); renderPrayerWall();
-        }
+/* ================= HABITS ================= */
 
-        function openHabitModal() { const m = document.getElementById('habitModal'); m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
-        function closeModalHabit() { const m = document.getElementById('habitModal'); m.classList.add('opacity-0', 'pointer-events-none'); m.classList.remove('opacity-100', 'pointer-events-auto'); }
-        window.closeHabitModal = closeModalHabit;
-        function toggleModalFields(val) { document.getElementById('modalQuantifiableFields').style.display = val === 'quantifiable' ? 'grid' : 'none'; }
-        function submitNewHabit() {
-            const name = document.getElementById('newHabitName').value.trim(); const type = document.getElementById('newHabitType').value;
-            const target = document.getElementById('newHabitTarget').value; const unit = document.getElementById('newHabitUnit').value.trim() || 'units'; if(!name) return;
-            appData.habits.push({ id: 'h_' + Date.now(), name: name, type: type, target: type === 'binary' ? 1 : Number(target), unit: type === 'binary' ? 'status' : unit, history: {}, currentStreak: 0 });
-            document.getElementById('newHabitName').value = ''; saveState(); closeModalHabit(); renderAdvancedHabits(); renderHeatmapMatrix();
-        }
-        function loadSoapNotes() {
-            if(!appData.soap) appData.soap = {s:'',o:'',a:'',p:''};
-            document.getElementById('soap-s').value = appData.soap.s || ''; document.getElementById('soap-o').value = appData.soap.o || '';
-            document.getElementById('soap-a').value = appData.soap.a || ''; document.getElementById('soap-p').value = appData.soap.p || '';
-        }
-        function saveSoapEntry() {
-            if(!appData.soap) appData.soap = {s:'',o:'',a:'',p:''};
-            appData.soap.s = document.getElementById('soap-s').value; appData.soap.o = document.getElementById('soap-o').value;
-            appData.soap.a = document.getElementById('soap-a').value; appData.soap.p = document.getElementById('soap-p').value;
-            saveState(); alert("Nkeiruka, your study reflection notes have been safely logged! ✨");
-        }
-        window.exportDataEngine = function() {
-            const blob = new Blob([JSON.stringify(appData)], { type: 'application/json' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `nkeiruka_sanctuary_deep_backup_${todayString}.json`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        };
-        window.importDataEngine = function(e) {
-            const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
-            reader.onload = function(evt) { try { appData = JSON.parse(evt.target.result); saveState(); location.reload(); } catch(err) { alert("Format Error."); } };
-            reader.readAsText(file);
-        };
-    </script>
+function openHabitModal() {
+    document.getElementById("habitModal").classList.remove("opacity-0","pointer-events-none");
+}
+
+function closeHabitModal() {
+    document.getElementById("habitModal").classList.add("opacity-0","pointer-events-none");
+}
+
+function submitNewHabit() {
+    const name = document.getElementById("newHabitName").value;
+
+    if (!name) return;
+
+    appData.habits.push({
+        id: Date.now(),
+        name,
+        logs: {}
+    });
+
+    saveData();
+    renderHabits();
+    closeHabitModal();
+}
+
+function toggleHabit(id) {
+    const today = new Date().toISOString().split("T")[0];
+    const habit = appData.habits.find(h => h.id === id);
+
+    habit.logs[today] = !habit.logs[today];
+
+    updateHeatmap(today);
+    saveData();
+    renderHabits();
+}
+
+function renderHabits() {
+    const grid = document.getElementById("habitWorkspaceGrid");
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    appData.habits.forEach(h => {
+        grid.innerHTML += `
+        <div class="p-4 border rounded-xl">
+            <h3>${h.name}</h3>
+            <button onclick="toggleHabit(${h.id})">Toggle Today</button>
+        </div>`;
+    });
+}
+
+/* ================= HEATMAP ================= */
+
+function updateHeatmap(date) {
+    appData.heatmap[date] = (appData.heatmap[date] || 0) + 1;
+}
+
+/* ================= SOAP ================= */
+
+function saveSoapEntry() {
+    const s = document.getElementById("soap-s").value;
+    const o = document.getElementById("soap-o").value;
+    const a = document.getElementById("soap-a").value;
+    const p = document.getElementById("soap-p").value;
+
+    appData.soapEntries.push({s,o,a,p,date:new Date()});
+
+    saveData();
+    alert("Saved");
+}
+
+/* ================= BIBLE API ================= */
+
+async function fetchFullBibleChapter() {
+    const book = document.getElementById("bible-book-select").value;
+    const chapter = document.getElementById("bible-chapter-select").value;
+
+    const body = document.getElementById("bible-view-body");
+    body.innerHTML = "Loading...";
+
+    try {
+        const res = await fetch(`https://bible-api.com/${book}+${chapter}`);
+        const data = await res.json();
+
+        body.innerHTML = data.verses.map(v =>
+            `<p><b>${v.verse}</b> ${v.text}</p>`
+        ).join("");
+
+    } catch {
+        body.innerHTML = "Failed to load scripture.";
+    }
+}
+
+/* ================= TOPICAL ================= */
+
+function fetchTopicalVerse(topic) {
+    const el = document.getElementById("topical-output");
+
+    const verses = {
+        peace: "John 14:27 — Peace I leave with you.",
+        faith: "Hebrews 11:1 — Faith is the substance...",
+        love: "1 Corinthians 13 — Love is patient..."
+    };
+
+    el.textContent = verses[topic];
+    el.classList.remove("hidden");
+}
+
+/* ================= TIMER ================= */
+
+let timer = null;
+let seconds = 300;
+
+function toggleSolitudeTimer() {
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+        return;
+    }
+
+    timer = setInterval(() => {
+        seconds--;
+        document.getElementById("timer-display").textContent =
+            new Date(seconds * 1000).toISOString().substr(14,5);
+
+        if (seconds <= 0) clearInterval(timer);
+    },1000);
+}
+
+/* ================= INIT ================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderHabits();
+    renderPrayers();
+});
+</script>
 </body>
 </html>
