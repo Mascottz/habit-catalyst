@@ -33,9 +33,7 @@
         }
     </script>
     <style>
-        .page { display: none !important; }
-        .page.active { display: block !important; }
-        
+        /* Heatmap Specific Base Stylings */
         .heatmap-grid {
             display: grid;
             grid-template-rows: repeat(7, 11px);
@@ -132,7 +130,7 @@
 
     <main class="max-w-5xl mx-auto px-4 py-8 md:py-12">
 
-        <section id="dashboard" class="page active space-y-8">
+        <section id="dashboard" class="page space-y-8 block">
             <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 id="dynamic-greeting" class="text-3xl font-bold text-gray-900 tracking-tight">Good Morning, Nkeiruka ✨</h1>
@@ -165,8 +163,8 @@
                         <span>More</span>
                     </div>
                 </div>
-                <div class="overflow-x-auto pb-2">
-                    <div id="heatmapGrid" class="heatmap-grid"></div>
+                <div class="w-full overflow-x-auto pb-2">
+                    <div id="heatmapGrid" class="heatmap-grid min-w-[660px]"></div>
                 </div>
             </div>
 
@@ -196,7 +194,7 @@
             </div>
         </section>
 
-        <section id="devotion" class="page space-y-8">
+        <section id="devotion" class="page space-y-8 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">Word & Devotion</h1>
                 <p class="text-sage-600">Deepen your roots in truth, Rosemary.</p>
@@ -268,7 +266,7 @@
             </div>
         </section>
 
-        <section id="bibleBrowser" class="page space-y-6">
+        <section id="bibleBrowser" class="page space-y-6 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">The Scroll</h1>
                 <p class="text-sage-600">Browse and immerse yourself into the complete Word of God.</p>
@@ -304,7 +302,7 @@
             </div>
         </section>
 
-        <section id="habits" class="page space-y-8">
+        <section id="habits" class="page space-y-8 hidden">
             <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">The Daily Temple</h1>
@@ -315,7 +313,7 @@
             <div id="habitWorkspaceGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <section id="prayer" class="page space-y-8">
+        <section id="prayer" class="page space-y-8 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">Prayer Wall & Testimony Archives</h1>
                 <p class="text-sage-600">Cast your burdens upon Him, and preserve the records of His infinite goodness.</p>
@@ -339,7 +337,7 @@
             </div>
         </section>
 
-        <section id="milestones" class="page space-y-8">
+        <section id="milestones" class="page space-y-8 hidden">
             <header>
                 <h1 class="text-3xl font-bold text-gray-900">Growth & Milestones</h1>
                 <p class="text-sage-600">Every small step builds a beautiful life of devotion.</p>
@@ -443,31 +441,54 @@
 
         const todayString = new Date().toISOString().split('T')[0];
 
-        // Migrated data storage key to bypass local browser state cache blocks
-        let appData = JSON.parse(localStorage.getItem('sanctuary_master_deep_store_v3')) || {
-            habits: [
-                { id: 'h1', name: 'Drink 3L Water 💧', type: 'quantifiable', target: 3000, unit: 'ml', history: {}, currentStreak: 0 },
-                { id: 'h2', name: 'Morning Gratitude ☀️', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 },
-                { id: 'h3', name: 'Scripture Meditation 📖', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 }
-            ],
-            prayers: [
-                { id: 1, text: "Praying for perfect clarity, guidance, and peace over my upcoming personal goals.", status: 'active', testimony: '' },
-                { id: 2, text: "Praise God for His continuous grace, protection, and unconditional love over my life.", status: 'answered', testimony: 'He has sustained me through every transition beautifully!', dateAnswered: '2026-05-28' }
-            ],
-            soap: { s: '', o: '', a: '', p: '' },
-            readingComplete: false
-        };
-
-        function saveState() {
-            localStorage.setItem('sanctuary_master_deep_store_v3', JSON.stringify(appData));
+        // Safe Fallback State Loader Engine (v4 Instance Separation)
+        let appData = { habits: [], prayers: [], soap: {s:'',o:'',a:'',p:''}, readingComplete: false };
+        try {
+            const raw = localStorage.getItem('sanctuary_master_deep_store_v4');
+            if (raw) {
+                appData = JSON.parse(raw);
+            } else {
+                throw new Error("Initialize Clean Cache Setup");
+            }
+        } catch(e) {
+            appData = {
+                habits: [
+                    { id: 'h1', name: 'Drink 3L Water 💧', type: 'quantifiable', target: 3000, unit: 'ml', history: {}, currentStreak: 0 },
+                    { id: 'h2', name: 'Morning Gratitude ☀️', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 },
+                    { id: 'h3', name: 'Scripture Meditation 📖', type: 'binary', target: 1, unit: 'status', history: {}, currentStreak: 0 }
+                ],
+                prayers: [
+                    { id: 1, text: "Praying for perfect clarity, guidance, and peace over my upcoming personal goals.", status: 'active', testimony: '' },
+                    { id: 2, text: "Praise God for His continuous grace, protection, and unconditional love over my life.", status: 'answered', testimony: 'He has sustained me through every transition beautifully!', dateAnswered: '2026-05-28' }
+                ],
+                soap: { s: '', o: '', a: '', p: '' },
+                readingComplete: false
+            };
+            localStorage.setItem('sanctuary_master_deep_store_v4', JSON.stringify(appData));
         }
 
-        function switchPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const activePage = document.getElementById(pageId);
-            if (activePage) activePage.classList.add('active');
+        function saveState() {
+            localStorage.setItem('sanctuary_master_deep_store_v4', JSON.stringify(appData));
+        }
 
-            // Web Navigation Highlight Synchronization Switch Layout Panel Fix
+        // Fixed Page Router Switching System Engine (Uses display utilities directly via Tailwind layout toggling hooks)
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.add('hidden');
+                p.classList.remove('block', 'space-y-8', 'space-y-6');
+            });
+            
+            const activePage = document.getElementById(pageId);
+            if (activePage) {
+                activePage.classList.remove('hidden');
+                if (pageId === 'bibleBrowser') {
+                    activePage.classList.add('block', 'space-y-6');
+                } else {
+                    activePage.classList.add('block', 'space-y-8');
+                }
+            }
+
+            // Sync Web Sidebar Buttons UI Display States
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if(btn.getAttribute('data-page') === pageId) {
                     btn.classList.add('bg-rosewood-50', 'text-rosewood-500');
@@ -478,7 +499,7 @@
                 }
             });
 
-            // Mobile Navigation Highlight Synchronization Layout Panel Fix
+            // Sync Mobile Nav Bottom Links Display Layout Framework States
             document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
                 if(btn.getAttribute('data-page') === pageId) {
                     btn.classList.add('text-rosewood-500');
@@ -529,19 +550,24 @@
 
             document.getElementById('devotion-title').innerHTML = `<i class="fa-solid fa-feather-pointed text-rosewood-500"></i> ${content.title}`;
             const bodyDiv = document.getElementById('devotion-body');
-            bodyDiv.innerHTML = '';
-            content.paragraphs.forEach(pText => {
-                const p = document.createElement('p');
-                p.innerText = pText;
-                bodyDiv.appendChild(p);
-            });
+            if(bodyDiv) {
+                bodyDiv.innerHTML = '';
+                content.paragraphs.forEach(pText => {
+                    const p = document.createElement('p');
+                    p.innerText = pText;
+                    bodyDiv.appendChild(p);
+                });
+            }
 
-            document.getElementById('reading-plan-container').innerHTML = `
-                <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 hover:bg-sage-50/50 cursor-pointer transition-all">
-                    <span class="text-sm font-semibold text-gray-700">${content.reading} — Deep Study Chapter</span>
-                    <input type="checkbox" onchange="appData.readingComplete = this.checked; saveState(); renderHeatmapMatrix();" ${appData.readingComplete ? 'checked' : ''} class="w-5 h-5 text-rosewood-500 accent-rosewood-500">
-                </label>
-            `;
+            const planContainer = document.getElementById('reading-plan-container');
+            if(planContainer) {
+                planContainer.innerHTML = `
+                    <label class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 hover:bg-sage-50/50 cursor-pointer transition-all">
+                        <span class="text-sm font-semibold text-gray-700">${content.reading} — Deep Study Chapter</span>
+                        <input type="checkbox" onchange="appData.readingComplete = this.checked; saveState(); renderHeatmapMatrix();" ${appData.readingComplete ? 'checked' : ''} class="w-5 h-5 text-rosewood-500 accent-rosewood-500">
+                    </label>
+                `;
+            }
         }
 
         function buildBibleBrowserDropdowns() {
@@ -561,6 +587,7 @@
             const bookIdx = document.getElementById('bible-book-select').value;
             const b = bibleBooksMetadata[bookIdx];
             const chapSelect = document.getElementById('bible-chapter-select');
+            if(!chapSelect) return;
             chapSelect.innerHTML = '';
             for(let i = 1; i <= b.chapters; i++) {
                 const opt = document.createElement('option');
@@ -577,34 +604,39 @@
             const viewTitle = document.getElementById('bible-view-title');
             const viewBody = document.getElementById('bible-view-body');
 
-            loader.classList.remove('hidden');
-            viewTitle.innerText = `${book.name} Chapter ${chapter}`;
+            if(loader) loader.classList.remove('hidden');
+            if(viewTitle) viewTitle.innerText = `${book.name} Chapter ${chapter}`;
 
             try {
                 const res = await fetch(`https://bible-api.com/${book.name}+${chapter}`);
                 if(!res.ok) throw new Error("Stream offline");
                 const data = await res.json();
                 
-                viewBody.innerHTML = '';
-                data.verses.forEach(v => {
-                    const p = document.createElement('p');
-                    p.className = "mb-3 tracking-normal text-gray-800";
-                    p.innerHTML = `<span class="text-rosewood-500 font-bold text-xs select-none mr-2">${v.verse}</span>${v.text}`;
-                    viewBody.appendChild(p);
-                });
+                if(viewBody) {
+                    viewBody.innerHTML = '';
+                    data.verses.forEach(v => {
+                        const p = document.createElement('p');
+                        p.className = "mb-3 tracking-normal text-gray-800 text-left";
+                        p.innerHTML = `<span class="text-rosewood-500 font-bold text-xs select-none mr-2">${v.verse}</span>${v.text}`;
+                        viewBody.appendChild(p);
+                    });
+                }
             } catch (err) {
-                viewBody.innerHTML = `
-                    <div class="p-4 rounded-xl bg-orange-50 text-orange-800 text-sm font-medium border border-orange-100">
-                        ⚠️ <strong>Connection Shield Active:</strong> The scroll pipeline is currently experiencing network delays in your area. Open up your physical scripture pages or try again in a brief second. God's truth remains unshakeable!
-                    </div>
-                `;
+                if(viewBody) {
+                    viewBody.innerHTML = `
+                        <div class="p-4 rounded-xl bg-orange-50 text-orange-800 text-sm font-medium border border-orange-100">
+                            ⚠️ <strong>Connection Shield Active:</strong> The scroll pipeline is currently experiencing network delays in your area. Open up your physical scripture pages or try again in a brief second. God's truth remains unshakeable!
+                        </div>
+                    `;
+                }
             } finally {
-                loader.classList.add('hidden');
+                if(loader) loader.classList.add('hidden');
             }
         }
 
         function alignSoul(mood) {
             const card = document.getElementById('soul-alignment-card');
+            if(!card) return;
             card.classList.remove('hidden');
             document.querySelectorAll('.soul-btn').forEach(b => b.classList.remove('bg-rosewood-50', 'text-rosewood-600', 'border-rosewood-300'));
             const alignments = {
@@ -618,14 +650,17 @@
         }
 
         function fetchTopicalVerse(topic) {
-            const out = document.getElementById('topical-output'); out.classList.remove('hidden');
+            const out = document.getElementById('topical-output'); 
+            if(!out) return;
+            out.classList.remove('hidden');
             const database = {
                 peace: "🕊️ John 14:27 — 'Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.'",
                 faith: "🛡️ Isaiah 41:10 — 'Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.'",
                 love: "❤️ Romans 8:38-39 — 'For I am persuaded, that neither death, nor life... shall be able to separate us from the love of God, which is in Christ Jesus our Lord.'"
             };
             out.innerText = database[topic];
-            document.getElementById('soap-s').value = database[topic];
+            const soapS = document.getElementById('soap-s');
+            if(soapS) soapS.value = database[topic];
         }
 
         let timerInterval = null; let timerDuration = 300;
@@ -652,6 +687,7 @@
 
         function renderAdvancedHabits() {
             const grid = document.getElementById('habitWorkspaceGrid'); if(!grid) return; grid.innerHTML = '';
+            if(!appData.habits || appData.habits.length === 0) return;
             appData.habits.forEach(habit => {
                 const progress = habit.history[todayString] || 0; const isDone = progress >= habit.target;
                 const card = document.createElement('div');
@@ -660,7 +696,7 @@
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-4">
                             <h4 class="font-bold text-gray-800 text-base leading-snug">${habit.name}</h4>
-                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full">🔥 ${habit.currentStreak}d</span>
+                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full">🔥 ${habit.currentStreak || 0}d</span>
                         </div>
                         <div class="flex justify-between items-center bg-gray-50/50 border border-gray-100 p-3 rounded-xl">
                             <span class="text-xs font-medium text-gray-400">${isDone ? 'Completed Today' : 'Mark Complete'}</span>
@@ -670,7 +706,7 @@
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-4">
                             <h4 class="font-bold text-gray-800 text-base leading-snug">${habit.name}</h4>
-                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full">🔥 ${habit.currentStreak}d</span>
+                            <span class="text-xs font-bold text-rosewood-500 bg-rosewood-50 px-2.5 py-1 rounded-full">🔥 ${habit.currentStreak || 0}d</span>
                         </div>
                         <div class="flex justify-between items-center bg-gray-50/50 border border-gray-100 p-3 rounded-xl">
                             <div class="text-sm font-bold text-gray-700">${progress} <span class="text-xs font-medium text-gray-400">/ ${habit.target} ${habit.unit}</span></div>
@@ -710,11 +746,13 @@
 
         function renderHeatmapMatrix() {
             const grid = document.getElementById('heatmapGrid'); if(!grid) return; grid.innerHTML = '';
-            const total = appData.habits.length; const today = new Date(); const dates = [];
+            const total = (appData.habits || []).length; const today = new Date(); const dates = [];
             for (let i = 364; i >= 0; i--) { const cur = new Date(); cur.setDate(today.getDate() - i); dates.push(cur); }
             dates.forEach(date => {
                 const dStr = date.toISOString().split('T')[0]; let doneCount = 0;
-                appData.habits.forEach(h => { if((h.history[dStr] || 0) >= h.target) doneCount++; });
+                if(appData.habits) {
+                    appData.habits.forEach(h => { if((h.history[dStr] || 0) >= h.target) doneCount++; });
+                }
                 let level = 0;
                 if(total > 0 && doneCount > 0) {
                     const ratio = doneCount / total;
@@ -729,16 +767,17 @@
         function renderPrayerWall() {
             const act = document.getElementById('active-prayers'); const ans = document.getElementById('answered-prayers');
             if(!act || !ans) return; act.innerHTML = ''; ans.innerHTML = '';
+            if(!appData.prayers) return;
             appData.prayers.forEach(p => {
                 if(p.status === 'active') {
-                    const div = document.createElement('div'); div.className = "bg-white p-4 rounded-xl border border-sage-100 shadow-sm flex justify-between items-center gap-4";
+                    const div = document.createElement('div'); div.className = "bg-white p-4 rounded-xl border border-sage-100 shadow-sm flex justify-between items-center gap-4 text-left";
                     div.innerHTML = `
                         <p class="text-sm text-gray-700 font-medium">"${p.text}"</p>
                         <button onclick="triggerHallelujahPipeline(${p.id})" class="text-gray-300 hover:text-emerald-500 transition-colors shrink-0"><i class="fa-solid fa-circle-check text-xl"></i></button>
                     `;
                     act.appendChild(div);
                 } else {
-                    const block = document.createElement('div'); block.className = "relative pl-6 pb-2 space-y-1";
+                    const block = document.createElement('div'); block.className = "relative pl-6 pb-2 space-y-1 text-left";
                     block.innerHTML = `
                         <div class="absolute left-0 top-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white shadow-sm ring-4 ring-emerald-5 z-10"></div>
                         <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Answered</span>
@@ -782,10 +821,12 @@
             document.getElementById('newHabitName').value = ''; saveState(); closeModalHabit(); renderAdvancedHabits(); renderHeatmapMatrix();
         }
         function loadSoapNotes() {
+            if(!appData.soap) appData.soap = {s:'',o:'',a:'',p:''};
             document.getElementById('soap-s').value = appData.soap.s || ''; document.getElementById('soap-o').value = appData.soap.o || '';
             document.getElementById('soap-a').value = appData.soap.a || ''; document.getElementById('soap-p').value = appData.soap.p || '';
         }
         function saveSoapEntry() {
+            if(!appData.soap) appData.soap = {s:'',o:'',a:'',p:''};
             appData.soap.s = document.getElementById('soap-s').value; appData.soap.o = document.getElementById('soap-o').value;
             appData.soap.a = document.getElementById('soap-a').value; appData.soap.p = document.getElementById('soap-p').value;
             saveState(); alert("Nkeiruka, your study reflection notes have been safely logged! ✨");
