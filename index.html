@@ -6,6 +6,40 @@
     <title>Nkeiruka's Sanctuary — Complete Spiritual Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+      import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDj6im2SHxPlPjKFQiYK-BOPG0V-Tz2mxM",
+        authDomain: "sanctuary-app-3465a.firebaseapp.com",
+        projectId: "sanctuary-app-3465a",
+        storageBucket: "sanctuary-app-3465a.firebasestorage.app",
+        messagingSenderId: "157704935946",
+        appId: "1:157704935946:web:542886ec62f58ac0075df3"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      window._firebase = {
+        app,
+        auth,
+        db,
+        onAuthStateChanged,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        signOut,
+        doc,
+        setDoc,
+        getDoc
+      };
+    </script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -43,8 +77,6 @@
         body {
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-
-        /* Fade-in for Scripture of the Day */
         .fade-in {
             opacity: 0;
             transition: opacity 0.7s ease;
@@ -52,8 +84,6 @@
         .fade-in.visible {
             opacity: 1;
         }
-
-        /* Heatmap */
         .heatmap-grid {
             display: grid;
             grid-template-rows: repeat(7, 11px);
@@ -73,7 +103,6 @@
         .heat-square.level-1 { background-color: #fca5a5; }
         .heat-square.level-2 { background-color: #f87171; }
         .heat-square.level-3 { background-color: #cf7575; }
-
         .heat-square:hover::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -90,8 +119,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.15);
             pointer-events: none;
         }
-
-        /* Dark mode BODY background (we handle most via Tailwind classes in HTML) */
         html.dark body {
             background: radial-gradient(circle at top, #111827 0, #020617 45%, #020617 100%);
             color: #e5e7eb;
@@ -144,13 +171,12 @@
                         <input type="file" accept=".json" onchange="importDataEngine(event)" class="hidden">
                     </label>
                 </div>
-                <!-- Dark mode toggle -->
                 <button id="theme-toggle" onclick="toggleTheme()" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 text-xs hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800">
                     <i class="fa-solid fa-moon" id="theme-toggle-icon"></i>
                 </button>
             </div>
             <div class="px-2 text-[11px] text-rosewood-400 font-medium italic dark:text-rosewood-100/80">
-                All your data stays privately on this device. Use Export to back it up or move it.
+                All your data stays privately on this device and your account. Use Export to back it up or move it.
             </div>
         </div>
     </nav>
@@ -166,6 +192,23 @@
 
     <main class="max-w-5xl mx-auto px-4 py-8 md:py-12">
 
+        <!-- AUTH OVERLAY -->
+        <div id="auth-overlay" class="fixed inset-0 bg-black/60 z-40 flex items-center justify-center hidden">
+          <div class="bg-white dark:bg-darkbg-800 rounded-2xl p-6 w-full max-w-sm shadow-xl border border-sage-100 dark:border-gray-700">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-gray-50 mb-2">Sign in to Sanctuary</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-300 mb-4">Create an account or sign in to sync your space across devices.</p>
+            <div class="space-y-3">
+              <input id="auth-email" type="email" placeholder="Email" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
+              <input id="auth-password" type="password" placeholder="Password" class="w-full text-sm p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
+            </div>
+            <div class="flex flex-col gap-2 mt-4">
+              <button onclick="handleEmailLogin()" class="w-full bg-rosewood-500 hover:bg-rosewood-600 text-white font-medium py-2 rounded-xl text-sm">Sign in</button>
+              <button onclick="handleEmailSignup()" class="w-full border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-100 font-medium py-2 rounded-xl text-sm">Create account</button>
+            </div>
+            <p id="auth-error" class="text-[11px] text-red-500 mt-2 h-4"></p>
+          </div>
+        </div>
+
         <!-- DASHBOARD -->
         <section id="dashboard" class="page space-y-8 block">
             <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -175,7 +218,6 @@
                 </div>
                 <div class="flex flex-col items-end gap-2">
                     <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-sage-100 text-sm font-medium text-rosewood-500 self-start dark:bg-darkbg-800 dark:border-gray-700 dark:text-rosewood-100" id="current-date"></div>
-                    <!-- Streak badge -->
                     <div id="streak-badge" class="hidden text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-200 dark:border-emerald-800"></div>
                 </div>
             </header>
@@ -312,9 +354,7 @@
                     </div>
                     <button onclick="saveSoapEntry()" class="w-full bg-rosewood-500 hover:bg-rosewood-600 text-white font-medium py-2.5 rounded-xl transition-colors text-sm shadow-sm">Save Study Entry</button>
 
-                    <!-- Recent SOAP history -->
                     <div id="soap-history" class="mt-4 border-t border-gray-100 pt-4 text-xs text-gray-600 space-y-2 dark:border-gray-700 dark:text-gray-300">
-                        <!-- Filled by JS -->
                     </div>
                 </div>
             </div>
@@ -477,14 +517,15 @@
         </div>
     </div>
 
-    <!-- SCRIPT TAG WILL COME IN CHUNK 2 -->
-    <script>
+<script>
 /* ================= CORE STATE ENGINE ================= */
 
 const STORAGE_KEY = "sanctuary_app_data_v1";
 const THEME_KEY = "sanctuary_theme";
 
 let appData;
+let currentUser = null;
+
 try {
     appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
         habits: [],
@@ -503,8 +544,54 @@ try {
     };
 }
 
-function saveData() {
+function saveDataLocal() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
+
+async function saveDataRemote() {
+    if (!currentUser || !window._firebase) return;
+    const { db, doc, setDoc } = window._firebase;
+    const userDocRef = doc(db, "users", currentUser.uid, "state", "appData");
+    await setDoc(userDocRef, appData, { merge: true });
+}
+
+async function saveData() {
+    saveDataLocal();
+    try {
+        await saveDataRemote();
+    } catch (e) {
+        console.warn("Remote save failed", e);
+    }
+}
+
+async function loadDataRemoteOrLocal(user) {
+    currentUser = user;
+
+    if (!user || !window._firebase) {
+        try {
+            appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || appData;
+        } catch {}
+        return;
+    }
+
+    const { db, doc, getDoc } = window._firebase;
+    const userDocRef = doc(db, "users", user.uid, "state", "appData");
+
+    try {
+        const snap = await getDoc(userDocRef);
+        if (snap.exists()) {
+            appData = snap.data();
+            saveDataLocal();
+        } else {
+            saveDataLocal();
+            await saveDataRemote();
+        }
+    } catch (e) {
+        console.warn("Failed to load remote data, using local only", e);
+        try {
+            appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || appData;
+        } catch {}
+    }
 }
 
 /* ================= THEME / DARK MODE ================= */
@@ -577,7 +664,7 @@ function initGreeting() {
     if (dateEl) dateEl.textContent = new Date().toDateString();
 }
 
-/* ================= SOUL ALIGN & SOUL-DRIVEN DEVOTION ================= */
+/* ================= SOUL ALIGN ================= */
 
 function alignSoul(state) {
     const el = document.getElementById("soul-alignment-card");
@@ -617,7 +704,6 @@ function alignSoul(state) {
         devotionTitle.textContent = info.title;
     }
 
-    // Move her into the Word & Devotion page for focused content
     switchPage("devotion");
     const devotionSection = document.getElementById("devotion");
     if (devotionSection) {
@@ -640,10 +726,10 @@ function importDataEngine(e) {
     if (!file) return;
     const reader = new FileReader();
 
-    reader.onload = () => {
+    reader.onload = async () => {
         try {
             appData = JSON.parse(reader.result);
-            saveData();
+            await saveData();
             alert("Imported successfully");
             location.reload();
         } catch (err) {
@@ -654,7 +740,47 @@ function importDataEngine(e) {
     reader.readAsText(file);
 }
 
-/* ================= PRAYER SYSTEM / TESTIMONY WALL ================= */
+/* ================= AUTH HANDLERS ================= */
+
+async function handleEmailLogin() {
+    const emailEl = document.getElementById("auth-email");
+    const passEl = document.getElementById("auth-password");
+    const errEl = document.getElementById("auth-error");
+    if (!emailEl || !passEl || !window._firebase) return;
+
+    errEl.textContent = "";
+    const { auth, signInWithEmailAndPassword } = window._firebase;
+
+    try {
+        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value.trim());
+    } catch (e) {
+        errEl.textContent = e.code || "Login failed";
+    }
+}
+
+async function handleEmailSignup() {
+    const emailEl = document.getElementById("auth-email");
+    const passEl = document.getElementById("auth-password");
+    const errEl = document.getElementById("auth-error");
+    if (!emailEl || !passEl || !window._firebase) return;
+
+    errEl.textContent = "";
+    const { auth, createUserWithEmailAndPassword } = window._firebase;
+
+    try {
+        await createUserWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value.trim());
+    } catch (e) {
+        errEl.textContent = e.code || "Signup failed";
+    }
+}
+
+async function handleSignOut() {
+    if (!window._firebase) return;
+    const { auth, signOut } = window._firebase;
+    await signOut(auth);
+}
+
+/* ================= PRAYER / TESTIMONY ================= */
 
 function addNewPrayerRequest() {
     const input = document.getElementById("prayer-input");
@@ -680,11 +806,11 @@ function renderPrayers() {
     active.innerHTML = "";
     answered.innerHTML = "";
 
-    if (appData.prayers.length === 0) {
+    if (!appData.prayers || appData.prayers.length === 0) {
         active.innerHTML = `<p class="text-xs text-gray-400 italic">No active petitions yet. Lay one at His feet today.</p>`;
     }
 
-    appData.prayers.forEach(p => {
+    (appData.prayers || []).forEach(p => {
         active.innerHTML += `
             <div class="bg-white dark:bg-gray-900 p-3 rounded-xl border border-sage-100 dark:border-gray-700 flex justify-between items-start gap-3">
                 <div class="flex-1">
@@ -698,11 +824,11 @@ function renderPrayers() {
         `;
     });
 
-    if (appData.answeredPrayers.length === 0) {
+    if (!appData.answeredPrayers || appData.answeredPrayers.length === 0) {
         answered.innerHTML = `<p class="text-xs text-gray-400 italic">No testimonies logged yet. Your Hallelujah stories will appear here.</p>`;
     }
 
-    appData.answeredPrayers.forEach(p => {
+    (appData.answeredPrayers || []).forEach(p => {
         answered.innerHTML += `
             <div class="bg-white dark:bg-gray-900 rounded-xl p-3 border border-emerald-100 dark:border-emerald-900 shadow-sm text-sm">
                 <div class="flex justify-between items-center mb-1">
@@ -731,10 +857,11 @@ function submitTestimony() {
     const id = parseInt(document.getElementById("target-prayer-id").value, 10);
     const note = document.getElementById("testimony-note").value.trim();
 
-    const index = appData.prayers.findIndex(p => p.id === id);
+    const index = (appData.prayers || []).findIndex(p => p.id === id);
     if (index !== -1) {
         const item = appData.prayers.splice(index, 1)[0];
         item.testimony = note;
+        appData.answeredPrayers = appData.answeredPrayers || [];
         appData.answeredPrayers.push(item);
 
         saveData();
@@ -781,6 +908,7 @@ function submitNewHabit() {
         unit = unitEl.value.trim() || "";
     }
 
+    appData.habits = appData.habits || [];
     appData.habits.push({
         id: Date.now(),
         name,
@@ -801,15 +929,13 @@ function submitNewHabit() {
 
 function toggleHabit(id) {
     const today = new Date().toISOString().split("T")[0];
+    appData.habits = appData.habits || [];
     const habit = appData.habits.find(h => h.id === id);
     if (!habit) return;
 
     if (habit.type === "binary") {
         habit.logs[today] = !habit.logs[today];
         if (habit.logs[today]) updateHeatmap(today);
-        else if (habit.logs[today] === false) {
-            // do not decrement heatmap count, leave as is to avoid negative
-        }
     } else {
         const current = habit.logs[today] || 0;
         habit.logs[today] = current + 1;
@@ -827,6 +953,8 @@ function renderHabits() {
     if (!grid) return;
 
     grid.innerHTML = "";
+
+    appData.habits = appData.habits || [];
 
     if (appData.habits.length === 0) {
         grid.innerHTML = `<p class="text-xs text-gray-400 italic">No habits yet. Start by adding one to your temple routine.</p>`;
@@ -866,6 +994,7 @@ function renderHabits() {
 /* ================= HEATMAP & STREAK ================= */
 
 function updateHeatmap(date) {
+    appData.heatmap = appData.heatmap || {};
     appData.heatmap[date] = (appData.heatmap[date] || 0) + 1;
     saveData();
 }
@@ -880,6 +1009,8 @@ function renderHeatmap() {
     const startDate = new Date(today);
     startDate.setDate(today.getDate() - 364);
     
+    appData.heatmap = appData.heatmap || {};
+
     for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split("T")[0];
         const count = appData.heatmap[dateStr] || 0;
@@ -895,12 +1026,11 @@ function renderHeatmap() {
     }
 }
 
-// Calculate streak from heatmap keys
 function calculateStreaks() {
+    appData.heatmap = appData.heatmap || {};
     const dates = Object.keys(appData.heatmap || {});
     if (!dates.length) return { current: 0, best: 0 };
 
-    // Normalize, sort ascending
     const sorted = dates
         .map(d => new Date(d))
         .sort((a, b) => a - b);
@@ -931,7 +1061,6 @@ function calculateStreaks() {
         }
     });
 
-    // Determine current streak: walk backwards from today
     let curStreak = 0;
     let cursor = new Date(todayStr);
     while (true) {
@@ -974,6 +1103,7 @@ function saveSoapEntry() {
 
     if (!s && !o && !a && !p) return;
 
+    appData.soapEntries = appData.soapEntries || [];
     appData.soapEntries.push({s,o,a,p,date:new Date().toISOString()});
 
     document.getElementById("soap-s").value = "";
@@ -983,7 +1113,7 @@ function saveSoapEntry() {
 
     saveData();
     renderSoapHistory();
-    alert("Study entry saved securely on this device.");
+    alert("Study entry saved securely.");
 }
 
 function renderSoapHistory() {
@@ -1017,7 +1147,7 @@ function renderSoapHistory() {
     `;
 }
 
-/* ================= BIBLE DATA / BROWSER ================= */
+/* ================= BIBLE BROWSER ================= */
 
 const BIBLE_BOOKS = [
     {name: "Genesis", chapters: 50}, {name: "Exodus", chapters: 40}, {name: "Leviticus", chapters: 27},
@@ -1167,10 +1297,9 @@ function toggleSolitudeTimer() {
     }, 1000);
 }
 
-/* ================= DAILY ROTATION DATA (THEMED) ================= */
+/* ================= DAILY DATA ================= */
 
 const DAILY_VERSES = [
-    // Identity in Christ (1–20)
     { ref: "John 1:12", query: "john 1:12" },
     { ref: "2 Corinthians 5:17", query: "2 corinthians 5:17" },
     { ref: "Galatians 2:20", query: "galatians 2:20" },
@@ -1192,7 +1321,6 @@ const DAILY_VERSES = [
     { ref: "Colossians 1:13-14", query: "colossians 1:13-14" },
     { ref: "Hebrews 4:16", query: "hebrews 4:16" },
 
-    // Peace & Comfort (21–40)
     { ref: "Philippians 4:6-7", query: "philippians 4:6-7" },
     { ref: "Isaiah 41:10", query: "isaiah 41:10" },
     { ref: "Psalm 23:1-3", query: "psalm 23:1-3" },
@@ -1214,7 +1342,6 @@ const DAILY_VERSES = [
     { ref: "Isaiah 43:2", query: "isaiah 43:2" },
     { ref: "Lamentations 3:22-23", query: "lamentations 3:22-23" },
 
-    // Faith & Trust (41–60)
     { ref: "Hebrews 11:1", query: "hebrews 11:1" },
     { ref: "Proverbs 3:5-6", query: "proverbs 3:5-6" },
     { ref: "2 Corinthians 5:7", query: "2 corinthians 5:7" },
@@ -1236,7 +1363,6 @@ const DAILY_VERSES = [
     { ref: "Hebrews 12:1-2", query: "hebrews 12:1-2" },
     { ref: "Romans 15:13", query: "romans 15:13" },
 
-    // Hope & God's Promises (61–80)
     { ref: "Jeremiah 29:11", query: "jeremiah 29:11" },
     { ref: "Romans 15:4", query: "romans 15:4" },
     { ref: "Psalm 130:5-6", query: "psalm 130:5-6" },
@@ -1260,7 +1386,6 @@ const DAILY_VERSES = [
 ];
 
 const DAILY_FOCUS_CHAPTERS = [
-    // Identity in Christ (1–20)
     { book: "Ephesians", chapter: 1 },
     { book: "Ephesians", chapter: 2 },
     { book: "Ephesians", chapter: 3 },
@@ -1282,7 +1407,6 @@ const DAILY_FOCUS_CHAPTERS = [
     { book: "John", chapter: 3 },
     { book: "Romans", chapter: 12 },
 
-    // Peace & Comfort (21–40)
     { book: "Psalm", chapter: 23 },
     { book: "Psalm", chapter: 27 },
     { book: "Psalm", chapter: 46 },
@@ -1304,7 +1428,6 @@ const DAILY_FOCUS_CHAPTERS = [
     { book: "Psalm", chapter: 62 },
     { book: "John", chapter: 14 },
 
-    // Faith & Trust (41–60)
     { book: "Hebrews", chapter: 11 },
     { book: "James", chapter: 1 },
     { book: "James", chapter: 2 },
@@ -1326,7 +1449,6 @@ const DAILY_FOCUS_CHAPTERS = [
     { book: "2 Corinthians", chapter: 12 },
     { book: "Romans", chapter: 15 },
 
-    // Hope & God's Promises (61–80)
     { book: "Jeremiah", chapter: 29 },
     { book: "Romans", chapter: 15 },
     { book: "Psalm", chapter: 130 },
@@ -1349,7 +1471,6 @@ const DAILY_FOCUS_CHAPTERS = [
     { book: "1 Corinthians", chapter: 15 }
 ];
 
-// Day-of-year helper (0–364)
 function getDayOfYearIndex() {
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
@@ -1358,8 +1479,6 @@ function getDayOfYearIndex() {
     const day = Math.floor(diff / oneDay);
     return day - 1;
 }
-
-/* ================= DAILY VERSE ================= */
 
 async function loadDailyVerse() {
     const verseEl = document.getElementById("dashboard-verse");
@@ -1371,7 +1490,7 @@ async function loadDailyVerse() {
     const todayVerse = DAILY_VERSES[idx];
 
     refEl.textContent = todayVerse.ref;
-    verseEl.classList.remove("visible"); // reset fade
+    verseEl.classList.remove("visible");
 
     try {
         const res = await fetch(`https://bible-api.com/${encodeURIComponent(todayVerse.query)}`);
@@ -1385,13 +1504,10 @@ async function loadDailyVerse() {
         verseEl.textContent = `Meditate on ${todayVerse.ref} today.`;
     }
 
-    // trigger fade-in
     requestAnimationFrame(() => {
         verseEl.classList.add("visible");
     });
 }
-
-/* ================= DAILY FOCUS CHAPTER ================= */
 
 function loadDailyFocusChapter() {
     const el = document.getElementById("dashboard-reading-chapter");
@@ -1407,20 +1523,46 @@ function loadDailyFocusChapter() {
 /* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Theme
     const initialTheme = localStorage.getItem(THEME_KEY) || "light";
     applyTheme(initialTheme);
 
-    initGreeting();
-    initBibleBrowser();
-    renderHabits();
-    renderPrayers();
-    renderHeatmap();
-    renderSoapHistory();
-    updateTimerDisplay();
-    loadDailyVerse();
-    loadDailyFocusChapter();
-    updateStreakBadge();
+    if (window._firebase) {
+        const { auth, onAuthStateChanged } = window._firebase;
+        const authOverlay = document.getElementById("auth-overlay");
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                currentUser = null;
+                if (authOverlay) authOverlay.classList.remove("hidden");
+                await loadDataRemoteOrLocal(null);
+            } else {
+                if (authOverlay) authOverlay.classList.add("hidden");
+                await loadDataRemoteOrLocal(user);
+            }
+
+            initGreeting();
+            initBibleBrowser();
+            renderHabits();
+            renderPrayers();
+            renderHeatmap();
+            renderSoapHistory();
+            updateTimerDisplay();
+            loadDailyVerse();
+            loadDailyFocusChapter();
+            updateStreakBadge();
+        });
+    } else {
+        initGreeting();
+        initBibleBrowser();
+        renderHabits();
+        renderPrayers();
+        renderHeatmap();
+        renderSoapHistory();
+        updateTimerDisplay();
+        loadDailyVerse();
+        loadDailyFocusChapter();
+        updateStreakBadge();
+    }
 });
 </script>
 </body>
